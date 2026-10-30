@@ -11,7 +11,7 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
   tool,
   initialInput,
 }) => {
-  const [text, setText] = useState<string>(initialInput?.text || 'Hello, World! 🚀');
+  const [text, setText] = useState<string>(initialInput?.text || 'Hello World! 🎉');
   const [mode, setMode] = useState<'encode' | 'decode'>(initialInput?.mode || 'encode');
   const [urlSafe, setUrlSafe] = useState<boolean>(initialInput?.urlSafe || false);
   const [output, setOutput] = useState<Base64ConverterOutput>({
@@ -58,16 +58,16 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
       outputData={output}
     >
       {/* Controls Ribbon */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="flex rounded-lg bg-slate-950 p-0.5 border border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
             <button
               type="button"
               onClick={() => setMode('encode')}
-              className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
                 mode === 'encode'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-indigo-600 font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Encode (Text → Base64)
@@ -75,22 +75,22 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
             <button
               type="button"
               onClick={() => setMode('decode')}
-              className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
                 mode === 'decode'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-indigo-600 font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Decode (Base64 → Text)
             </button>
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none hover:text-white">
+          <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none hover:text-slate-900">
             <input
               type="checkbox"
               checked={urlSafe}
               onChange={(e) => setUrlSafe(e.target.checked)}
-              className="rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
             />
             <span>URL-Safe Alphabet</span>
           </label>
@@ -105,7 +105,7 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
               title="Use output as next input and flip mode"
               className="text-xs gap-1.5"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-400" />
+              <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600" />
               <span>Swap Input / Output</span>
             </Button>
           )}
@@ -114,11 +114,11 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
 
       {/* Error Banner */}
       {!output.isValid && output.error && (
-        <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-200 text-xs">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <div className="flex flex-col gap-0.5">
-            <span className="font-semibold text-rose-300">Base64 Decoding Error</span>
-            <p className="font-mono text-rose-200/90">{output.error}</p>
+            <span className="font-semibold text-rose-900">Base64 Decoding Error</span>
+            <p className="font-mono text-rose-700">{output.error}</p>
           </div>
         </div>
       )}
@@ -131,7 +131,7 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
           onChange={setText}
           placeholder={mode === 'encode' ? 'Type text to encode...' : 'Paste Base64 to decode...'}
           filename={mode === 'encode' ? 'input.txt' : 'input.b64'}
-          height="h-80 lg:h-[450px]"
+          height="h-64 sm:h-80 lg:h-[450px]"
         />
 
         <CodeEditor
@@ -140,7 +140,7 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
           readOnly
           placeholder="Result will appear here..."
           filename={mode === 'encode' ? 'encoded.b64' : 'decoded.txt'}
-          height="h-80 lg:h-[450px]"
+          height="h-64 sm:h-80 lg:h-[450px]"
         />
       </div>
     </ToolShell>

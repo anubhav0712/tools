@@ -6,6 +6,81 @@
   },
   "tools": [
     {
+      "name": "text-analyzer",
+      "description": "Instant word count, character count, sentences, paragraphs, and reading time estimates for writers, students, and everyday tasks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The text to analyze and count"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "words": {
+            "type": "number",
+            "description": "Total word count"
+          },
+          "characters": {
+            "type": "number",
+            "description": "Total character count including spaces"
+          },
+          "charactersNoSpaces": {
+            "type": "number",
+            "description": "Character count excluding spaces"
+          },
+          "sentences": {
+            "type": "number",
+            "description": "Estimated sentence count"
+          },
+          "paragraphs": {
+            "type": "number",
+            "description": "Paragraph count"
+          },
+          "readingTimeMinutes": {
+            "type": "number",
+            "description": "Estimated reading time in minutes (based on 200 WPM)"
+          },
+          "speakingTimeMinutes": {
+            "type": "number",
+            "description": "Estimated speaking time in minutes (based on 130 WPM)"
+          }
+        },
+        "required": [
+          "words",
+          "characters",
+          "charactersNoSpaces",
+          "sentences",
+          "paragraphs",
+          "readingTimeMinutes",
+          "speakingTimeMinutes"
+        ],
+        "additionalProperties": false
+      },
+      "metadata": {
+        "category": "text",
+        "version": "1.0.0",
+        "keywords": [
+          "word counter",
+          "character count",
+          "words",
+          "reading time",
+          "text",
+          "essay",
+          "characters"
+        ],
+        "deepLinkSupported": true,
+        "agentPrompt": "Analyze text to get word count, characters, sentence count, and reading time estimates."
+      }
+    },
+    {
       "name": "base64-converter",
       "description": "Encode and decode standard or URL-safe Base64 strings with full UTF-8 Unicode support.",
       "inputSchema": {

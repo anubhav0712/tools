@@ -12,7 +12,7 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
   initialInput,
 }) => {
   const [rawJson, setRawJson] = useState<string>(
-    initialInput?.rawJson || '{\n  "title": "Tools Platform",\n  "status": "ready",\n  "mcp": true,\n  "tags": ["offline", "privacy", "fast"]\n}'
+    initialInput?.rawJson || '{\n  "title": "Online Tools",\n  "offline": true,\n  "privacy": "100%",\n  "features": ["fast", "clean", "responsive"]\n}'
   );
   const [indent, setIndent] = useState<number>(initialInput?.indent ?? 2);
   const [sortKeys, setSortKeys] = useState<boolean>(initialInput?.sortKeys ?? false);
@@ -74,10 +74,10 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
       outputData={output}
     >
       {/* Controls & Presets Ribbon */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-medium text-slate-400">Indent:</span>
-          <div className="flex rounded-lg bg-slate-950 p-0.5 border border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <span className="text-xs font-medium text-slate-500">Indent:</span>
+          <div className="flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
             {[
               { label: '2 Spaces', val: 2 },
               { label: '4 Spaces', val: 4 },
@@ -87,10 +87,10 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
                 key={opt.val}
                 type="button"
                 onClick={() => setIndent(opt.val)}
-                className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
+                className={`text-xs px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
                   indent === opt.val
-                    ? 'bg-indigo-600 text-white font-medium'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-indigo-600 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {opt.label}
@@ -98,12 +98,12 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
             ))}
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer ml-2 select-none hover:text-white">
+          <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer ml-1 select-none hover:text-slate-900">
             <input
               type="checkbox"
               checked={sortKeys}
               onChange={(e) => setSortKeys(e.target.checked)}
-              className="rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
             />
             <span className="flex items-center gap-1">
               <ArrowUpDown className="w-3 h-3 text-slate-400" />
@@ -115,15 +115,15 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
         {/* Examples & Upload Actions */}
         <div className="flex items-center gap-2">
           {tool.examples && tool.examples.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-slate-500">Presets:</span>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <span className="text-xs text-slate-400">Presets:</span>
               {tool.examples.map((ex, idx) => (
                 <Button
                   key={ex.title}
                   variant="ghost"
                   size="sm"
                   onClick={() => handleLoadExample(idx)}
-                  className="text-xs text-slate-400 hover:text-indigo-400 h-7 px-2"
+                  className="text-xs text-slate-600 hover:text-indigo-600 h-7 px-2"
                 >
                   {ex.title}
                 </Button>
@@ -148,7 +148,7 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
                 input?.click();
               }}
             >
-              <FileUp className="w-3.5 h-3.5 text-slate-400" />
+              <FileUp className="w-3.5 h-3.5 text-slate-500" />
               <span>Load File</span>
             </Button>
           </label>
@@ -157,11 +157,11 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
 
       {/* Syntax Error Banner */}
       {!output.isValid && output.error && (
-        <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-200 text-xs">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <div className="flex flex-col gap-0.5">
-            <span className="font-semibold text-rose-300">Invalid JSON Syntax</span>
-            <p className="font-mono text-rose-200/90">{output.error}</p>
+            <span className="font-semibold text-rose-900">Invalid JSON Syntax</span>
+            <p className="font-mono text-rose-700">{output.error}</p>
           </div>
         </div>
       )}
@@ -174,7 +174,7 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
           onChange={setRawJson}
           placeholder="Paste or type raw JSON here..."
           filename="input.json"
-          height="h-80 lg:h-[450px]"
+          height="h-64 sm:h-80 lg:h-[450px]"
         />
 
         <CodeEditor
@@ -182,13 +182,13 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
           value={output.formatted}
           readOnly
           filename="formatted.json"
-          height="h-80 lg:h-[450px]"
+          height="h-64 sm:h-80 lg:h-[450px]"
           actions={
             <Button
               variant="ghost"
               size="sm"
               onClick={() => runFormatter(rawJson, indent, sortKeys)}
-              className="text-xs text-indigo-400 hover:text-indigo-300 gap-1 h-6 px-2"
+              className="text-xs text-indigo-600 hover:text-indigo-700 gap-1 h-6 px-2"
             >
               <Play className="w-3 h-3 fill-current" />
               <span>Re-run</span>

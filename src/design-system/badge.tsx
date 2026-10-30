@@ -13,15 +13,14 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const base =
-    'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors';
+    'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors select-none';
 
   const variants = {
-    default: 'bg-slate-800 text-slate-300 border border-slate-700',
-    agent:
-      'bg-purple-950/80 text-purple-300 border border-purple-700/60 shadow-sm shadow-purple-950/40',
-    gui: 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/50',
-    success: 'bg-green-950/60 text-green-300 border border-green-700/50',
-    warning: 'bg-amber-950/60 text-amber-300 border border-amber-700/50',
+    default: 'bg-slate-100 text-slate-700 border border-slate-200',
+    agent: 'bg-purple-50 text-purple-700 border border-purple-200/90 shadow-2xs',
+    gui: 'bg-emerald-50 text-emerald-700 border border-emerald-200/90',
+    success: 'bg-green-50 text-green-700 border border-green-200',
+    warning: 'bg-amber-50 text-amber-800 border border-amber-200',
   };
 
   return (

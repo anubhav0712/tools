@@ -1741,18 +1741,18 @@ var require_react_jsx_runtime_development = __commonJS({
       function isValidElement(object) {
         return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
       }
-      var React6 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React6.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+      var React7 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React7.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
         return null;
       };
-      React6 = {
+      React7 = {
         react_stack_bottom_frame: function(callStackForError) {
           return callStackForError();
         }
       };
       var specialPropKeyWarningShown;
       var didWarnAboutElementRef = {};
-      var unknownOwnerDebugStack = React6.react_stack_bottom_frame.bind(
-        React6,
+      var unknownOwnerDebugStack = React7.react_stack_bottom_frame.bind(
+        React7,
         UnknownOwner
       )();
       var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
@@ -7212,74 +7212,41 @@ function generateMcpManifest() {
   };
 }
 
-// src/tools/base64-converter/engine.ts
-function bytesToBase64(bytes) {
-  let binary = "";
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-function base64ToBytes(base64) {
-  const binary = atob(base64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-function executeBase64Converter(input) {
-  const { text, mode, urlSafe } = input;
-  if (!text) {
+// src/tools/text-analyzer/engine.ts
+function executeTextAnalyzer(input) {
+  const text = input.text || "";
+  const trimmed = text.trim();
+  if (!trimmed) {
     return {
-      result: "",
-      isValid: true,
-      byteSize: 0
+      words: 0,
+      characters: 0,
+      charactersNoSpaces: 0,
+      sentences: 0,
+      paragraphs: 0,
+      readingTimeMinutes: 0,
+      speakingTimeMinutes: 0
     };
   }
-  try {
-    if (mode === "encode") {
-      const bytes = new TextEncoder().encode(text);
-      let encoded = bytesToBase64(bytes);
-      if (urlSafe) {
-        encoded = encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-      }
-      return {
-        result: encoded,
-        isValid: true,
-        byteSize: new Blob([encoded]).size
-      };
-    } else {
-      let sanitized = text.trim();
-      if (urlSafe || sanitized.includes("-") || sanitized.includes("_")) {
-        sanitized = sanitized.replace(/-/g, "+").replace(/_/g, "/");
-        while (sanitized.length % 4 !== 0) {
-          sanitized += "=";
-        }
-      }
-      const bytes = base64ToBytes(sanitized);
-      const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-      return {
-        result: decoded,
-        isValid: true,
-        byteSize: new Blob([decoded]).size
-      };
-    }
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : "Invalid Base64 sequence";
-    return {
-      result: text,
-      isValid: false,
-      error: errorMsg,
-      byteSize: new Blob([text]).size
-    };
-  }
+  const words = (trimmed.match(/[\p{L}\p{N}_'-]+/gu) || []).length;
+  const characters = text.length;
+  const charactersNoSpaces = text.replace(/\s/g, "").length;
+  const sentences = (trimmed.match(/[^.!?]+[.!?]+(\s|$)/g) || [trimmed]).length;
+  const paragraphs = trimmed.split(/\n+/).map((p) => p.trim()).filter(Boolean).length;
+  const readingTimeMinutes = Math.max(0.1, Number((words / 200).toFixed(1)));
+  const speakingTimeMinutes = Math.max(0.1, Number((words / 130).toFixed(1)));
+  return {
+    words,
+    characters,
+    charactersNoSpaces,
+    sentences,
+    paragraphs,
+    readingTimeMinutes: words > 0 ? readingTimeMinutes : 0,
+    speakingTimeMinutes: words > 0 ? speakingTimeMinutes : 0
+  };
 }
 
-// src/tools/base64-converter/ui.tsx
-var import_react6 = __toESM(require_react(), 1);
+// src/tools/text-analyzer/ui.tsx
+var import_react5 = __toESM(require_react(), 1);
 
 // node_modules/lucide-react/dist/esm/createLucideIcon.js
 var import_react2 = __toESM(require_react(), 1);
@@ -7400,53 +7367,68 @@ var __iconNode6 = [
 ];
 var CircleAlert = createLucideIcon("CircleAlert", __iconNode6);
 
-// node_modules/lucide-react/dist/esm/icons/copy.js
+// node_modules/lucide-react/dist/esm/icons/clock.js
 var __iconNode7 = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
+];
+var Clock = createLucideIcon("Clock", __iconNode7);
+
+// node_modules/lucide-react/dist/esm/icons/copy.js
+var __iconNode8 = [
   ["rect", { width: "14", height: "14", x: "8", y: "8", rx: "2", ry: "2", key: "17jyea" }],
   ["path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", key: "zix9uf" }]
 ];
-var Copy = createLucideIcon("Copy", __iconNode7);
+var Copy = createLucideIcon("Copy", __iconNode8);
 
 // node_modules/lucide-react/dist/esm/icons/download.js
-var __iconNode8 = [
+var __iconNode9 = [
   ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }],
   ["polyline", { points: "7 10 12 15 17 10", key: "2ggqvy" }],
   ["line", { x1: "12", x2: "12", y1: "15", y2: "3", key: "1vk2je" }]
 ];
-var Download = createLucideIcon("Download", __iconNode8);
+var Download = createLucideIcon("Download", __iconNode9);
 
 // node_modules/lucide-react/dist/esm/icons/file-up.js
-var __iconNode9 = [
+var __iconNode10 = [
   ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
   ["path", { d: "M12 12v6", key: "3ahymv" }],
   ["path", { d: "m15 15-3-3-3 3", key: "15xj92" }]
 ];
-var FileUp = createLucideIcon("FileUp", __iconNode9);
+var FileUp = createLucideIcon("FileUp", __iconNode10);
+
+// node_modules/lucide-react/dist/esm/icons/mic.js
+var __iconNode11 = [
+  ["path", { d: "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z", key: "131961" }],
+  ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
+  ["line", { x1: "12", x2: "12", y1: "19", y2: "22", key: "x3vr5v" }]
+];
+var Mic = createLucideIcon("Mic", __iconNode11);
 
 // node_modules/lucide-react/dist/esm/icons/play.js
-var __iconNode10 = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
-var Play = createLucideIcon("Play", __iconNode10);
+var __iconNode12 = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
+var Play = createLucideIcon("Play", __iconNode12);
 
 // node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
-var __iconNode11 = [
+var __iconNode13 = [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ];
-var RotateCcw = createLucideIcon("RotateCcw", __iconNode11);
+var RotateCcw = createLucideIcon("RotateCcw", __iconNode13);
 
 // node_modules/lucide-react/dist/esm/icons/share-2.js
-var __iconNode12 = [
+var __iconNode14 = [
   ["circle", { cx: "18", cy: "5", r: "3", key: "gq8acd" }],
   ["circle", { cx: "6", cy: "12", r: "3", key: "w7nqdw" }],
   ["circle", { cx: "18", cy: "19", r: "3", key: "1xt0gg" }],
   ["line", { x1: "8.59", x2: "15.42", y1: "13.51", y2: "17.49", key: "47mynk" }],
   ["line", { x1: "15.41", x2: "8.59", y1: "6.51", y2: "10.49", key: "1n3mei" }]
 ];
-var Share2 = createLucideIcon("Share2", __iconNode12);
+var Share2 = createLucideIcon("Share2", __iconNode14);
 
 // node_modules/lucide-react/dist/esm/icons/shield-check.js
-var __iconNode13 = [
+var __iconNode15 = [
   [
     "path",
     {
@@ -7456,10 +7438,10 @@ var __iconNode13 = [
   ],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-var ShieldCheck = createLucideIcon("ShieldCheck", __iconNode13);
+var ShieldCheck = createLucideIcon("ShieldCheck", __iconNode15);
 
 // node_modules/lucide-react/dist/esm/icons/sparkles.js
-var __iconNode14 = [
+var __iconNode16 = [
   [
     "path",
     {
@@ -7472,31 +7454,31 @@ var __iconNode14 = [
   ["path", { d: "M4 17v2", key: "vumght" }],
   ["path", { d: "M5 18H3", key: "zchphs" }]
 ];
-var Sparkles = createLucideIcon("Sparkles", __iconNode14);
+var Sparkles = createLucideIcon("Sparkles", __iconNode16);
 
 // node_modules/lucide-react/dist/esm/icons/terminal.js
-var __iconNode15 = [
+var __iconNode17 = [
   ["polyline", { points: "4 17 10 11 4 5", key: "akl6gq" }],
   ["line", { x1: "12", x2: "20", y1: "19", y2: "19", key: "q2wloq" }]
 ];
-var Terminal = createLucideIcon("Terminal", __iconNode15);
+var Terminal = createLucideIcon("Terminal", __iconNode17);
 
 // node_modules/lucide-react/dist/esm/icons/trash-2.js
-var __iconNode16 = [
+var __iconNode18 = [
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", key: "4alrt4" }],
   ["path", { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2", key: "v07s0e" }],
   ["line", { x1: "10", x2: "10", y1: "11", y2: "17", key: "1uufr5" }],
   ["line", { x1: "14", x2: "14", y1: "11", y2: "17", key: "xtxkd" }]
 ];
-var Trash2 = createLucideIcon("Trash2", __iconNode16);
+var Trash2 = createLucideIcon("Trash2", __iconNode18);
 
 // node_modules/lucide-react/dist/esm/icons/x.js
-var __iconNode17 = [
+var __iconNode19 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X = createLucideIcon("X", __iconNode17);
+var X = createLucideIcon("X", __iconNode19);
 
 // src/design-system/tool-shell.tsx
 var import_react4 = __toESM(require_react(), 1);
@@ -10781,19 +10763,19 @@ var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 var Button = (0, import_react3.forwardRef)(
   ({ className, variant = "secondary", size = "md", children, disabled, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]";
+    const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98] cursor-pointer";
     const variants = {
-      primary: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-600/30 hover:shadow-indigo-500/40 border border-indigo-500",
-      secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600",
-      ghost: "bg-transparent hover:bg-slate-800/80 text-slate-300 hover:text-white",
-      agent: "bg-purple-950/80 hover:bg-purple-900/90 text-purple-200 border border-purple-700/60 shadow-sm shadow-purple-900/20 hover:border-purple-600",
-      danger: "bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 border border-rose-800/60 hover:border-rose-600"
+      primary: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-600/20 border border-indigo-600",
+      secondary: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 shadow-xs",
+      ghost: "bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900",
+      agent: "bg-purple-50 hover:bg-purple-100/80 text-purple-700 border border-purple-200 shadow-xs",
+      danger: "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 shadow-xs"
     };
     const sizes = {
-      sm: "text-xs px-2.5 py-1.5 gap-1.5",
-      md: "text-sm px-3.5 py-2 gap-2",
-      lg: "text-base px-5 py-2.5 gap-2.5",
-      icon: "p-2 text-slate-400 hover:text-white"
+      sm: "text-xs px-2.5 py-1.5 min-h-[32px] gap-1.5",
+      md: "text-sm px-3.5 py-2 min-h-[38px] gap-2",
+      lg: "text-base px-5 py-2.5 min-h-[44px] gap-2.5",
+      icon: "p-2 min-w-[38px] min-h-[38px] text-slate-500 hover:text-slate-800 hover:bg-slate-100"
     };
     return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
       "button",
@@ -10817,13 +10799,13 @@ var Badge = ({
   children,
   ...props
 }) => {
-  const base = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors";
+  const base = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors select-none";
   const variants = {
-    default: "bg-slate-800 text-slate-300 border border-slate-700",
-    agent: "bg-purple-950/80 text-purple-300 border border-purple-700/60 shadow-sm shadow-purple-950/40",
-    gui: "bg-emerald-950/60 text-emerald-300 border border-emerald-700/50",
-    success: "bg-green-950/60 text-green-300 border border-green-700/50",
-    warning: "bg-amber-950/60 text-amber-300 border border-amber-700/50"
+    default: "bg-slate-100 text-slate-700 border border-slate-200",
+    agent: "bg-purple-50 text-purple-700 border border-purple-200/90 shadow-2xs",
+    gui: "bg-emerald-50 text-emerald-700 border border-emerald-200/90",
+    success: "bg-green-50 text-green-700 border border-green-200",
+    warning: "bg-amber-50 text-amber-800 border border-amber-200"
   };
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: twMerge(clsx(base, variants[variant], className)), ...props, children });
 };
@@ -10864,26 +10846,26 @@ var ToolShell = ({
     setCopiedModalJson(true);
     setTimeout(() => setCopiedModalJson(false), 2e3);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-6 max-w-7xl mx-auto w-full", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-4", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-5 sm:gap-6 max-w-7xl mx-auto w-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-3 sm:gap-4", children: [
       onBack && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
         Button,
         {
           variant: "ghost",
           size: "sm",
           onClick: onBack,
-          className: "text-slate-400 hover:text-white -ml-2 gap-1.5",
+          className: "text-slate-500 hover:text-slate-900 -ml-2 gap-1.5",
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ArrowLeft, { className: "w-4 h-4" }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Back to all tools" })
           ]
         }
       ) }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-slate-200", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2.5 flex-wrap", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h1", { className: "text-2xl font-bold tracking-tight text-white", children: tool.metadata.name }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2 flex-wrap", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h1", { className: "text-xl sm:text-2xl font-bold tracking-tight text-slate-900", children: tool.metadata.name }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono border border-slate-200", children: [
               "v",
               tool.metadata.version
             ] }),
@@ -10896,20 +10878,20 @@ var ToolShell = ({
                 title: "Click to view MCP & API spec",
                 className: "cursor-pointer transition-opacity hover:opacity-80",
                 children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Badge, { variant: "agent", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Bot, { className: "w-3 h-3 text-purple-400" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "MCP Ready" })
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Bot, { className: "w-3 h-3 text-purple-600" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Agent Ready" })
                 ] })
               }
             ) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Badge, { variant: "gui", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Sparkles, { className: "w-3 h-3 text-emerald-400" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Interactive GUI" })
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Sparkles, { className: "w-3 h-3 text-emerald-600" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Interactive" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Badge, { variant: "default", className: "text-emerald-400/90 border-emerald-900/50", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ShieldCheck, { className: "w-3 h-3 text-emerald-400" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "100% Local" })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Badge, { variant: "default", className: "text-emerald-700 border-emerald-200 bg-emerald-50", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ShieldCheck, { className: "w-3 h-3 text-emerald-600" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "100% In-Browser" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-sm text-slate-400 max-w-3xl", children: tool.metadata.description })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed", children: tool.metadata.description })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2 flex-wrap", children: [
           tool.agent.deepLink !== false && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
@@ -10920,10 +10902,10 @@ var ToolShell = ({
               onClick: handleShareUrl,
               title: "Copy shareable link with current input",
               children: copiedShare ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Check, { className: "w-3.5 h-3.5 text-emerald-400" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Check, { className: "w-3.5 h-3.5 text-emerald-600" }),
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Link Copied" })
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Share2, { className: "w-3.5 h-3.5 text-slate-400" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Share2, { className: "w-3.5 h-3.5 text-slate-500" }),
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Share URL" })
               ] })
             }
@@ -10935,7 +10917,7 @@ var ToolShell = ({
               size: "sm",
               onClick: onReset,
               title: "Reset input and output",
-              className: "text-slate-400 hover:text-white",
+              className: "text-slate-600 hover:text-slate-900",
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(RotateCcw, { className: "w-3.5 h-3.5" }),
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Reset" })
@@ -10945,14 +10927,14 @@ var ToolShell = ({
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex flex-col gap-6", children }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-3 py-3 px-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-500", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex flex-col gap-5 sm:gap-6", children }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-3 py-2.5 px-4 rounded-xl bg-slate-100/70 border border-slate-200 text-xs text-slate-600", children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Privacy Guaranteed: Processed 100% locally in browser" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Private & Secure: Processed 100% locally on your device" }),
         typeof executionTimeMs === "number" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-700", children: "\u2022" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-mono text-slate-400", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-300", children: "\u2022" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-mono text-slate-500", children: [
             executionTimeMs.toFixed(2),
             "ms"
           ] })
@@ -10963,7 +10945,7 @@ var ToolShell = ({
         {
           type: "button",
           onClick: () => setShowAgentModal(true),
-          className: "flex items-center gap-1.5 text-slate-400 hover:text-purple-300 transition-colors",
+          className: "flex items-center gap-1.5 text-slate-500 hover:text-purple-600 transition-colors",
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Terminal, { className: "w-3.5 h-3.5" }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Developer / Agent Spec" })
@@ -10971,11 +10953,11 @@ var ToolShell = ({
         }
       )
     ] }),
-    showAgentModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/40", children: [
+    showAgentModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden flex flex-col", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Bot, { className: "w-4 h-4 text-purple-400" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h3", { className: "font-semibold text-sm text-white", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Bot, { className: "w-4 h-4 text-purple-600" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h3", { className: "font-semibold text-sm text-slate-900", children: [
             "Agent & Developer Spec: ",
             tool.metadata.name
           ] })
@@ -10985,36 +10967,36 @@ var ToolShell = ({
           {
             type: "button",
             onClick: () => setShowAgentModal(false),
-            className: "text-slate-400 hover:text-white p-1 rounded-md",
+            className: "text-slate-400 hover:text-slate-700 p-1 rounded-md",
             children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(X, { className: "w-4 h-4" })
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-5 flex flex-col gap-4 text-xs text-slate-300 max-h-[70vh] overflow-y-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-5 flex flex-col gap-4 text-xs text-slate-700 max-h-[70vh] overflow-y-auto", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400 font-medium", children: "Tool ID:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { className: "ml-2 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 font-mono text-purple-300", children: tool.metadata.id })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-500 font-medium", children: "Tool ID:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { className: "ml-2 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 font-mono text-purple-700", children: tool.metadata.id })
         ] }),
-        tool.agent.agentPrompt && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-300", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-400 block mb-1", children: "Agent Instructions:" }),
+        tool.agent.agentPrompt && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-800 block mb-1", children: "Agent Instructions:" }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: tool.agent.agentPrompt })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-400 block mb-1", children: "Local MCP Server Invocation:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("pre", { className: "p-3 rounded-lg bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800 overflow-x-auto", children: `npx tsx scripts/mcp-server.ts` })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-800 block mb-1", children: "Local MCP Server Invocation:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("pre", { className: "p-3 rounded-lg bg-slate-900 font-mono text-[11px] text-slate-100 overflow-x-auto", children: `npx tsx scripts/mcp-server.ts` })
         ] }),
         Boolean(inputData || outputData) && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between mb-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-400", children: "Current Payload (JSON):" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-800", children: "Current Payload (JSON):" }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               Button,
               {
                 variant: "ghost",
                 size: "sm",
                 onClick: handleCopyAgentContext,
-                className: "text-xs h-6 px-2 text-purple-300 gap-1",
+                className: "text-xs h-6 px-2 text-purple-700 gap-1",
                 children: copiedModalJson ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Check, { className: "w-3 h-3 text-emerald-400" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Check, { className: "w-3 h-3 text-emerald-600" }),
                   /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "Copied" })
                 ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
                   /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Copy, { className: "w-3 h-3" }),
@@ -11023,10 +11005,10 @@ var ToolShell = ({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("pre", { className: "p-3 rounded-lg bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800 overflow-x-auto max-h-48", children: JSON.stringify({ input: inputData, output: outputData }, null, 2) })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("pre", { className: "p-3 rounded-lg bg-slate-900 font-mono text-[11px] text-slate-100 overflow-x-auto max-h-48", children: JSON.stringify({ input: inputData, output: outputData }, null, 2) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex items-center justify-end px-5 py-3 border-t border-slate-800 bg-slate-950/40", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex items-center justify-end px-5 py-3 border-t border-slate-100 bg-slate-50", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         Button,
         {
           variant: "secondary",
@@ -11039,9 +11021,353 @@ var ToolShell = ({
   ] });
 };
 
-// src/design-system/code-editor.tsx
-var import_react5 = __toESM(require_react(), 1);
+// src/tools/text-analyzer/ui.tsx
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
+var TextAnalyzerUI = ({
+  tool,
+  initialInput
+}) => {
+  const [text, setText] = (0, import_react5.useState)(
+    initialInput?.text || "Welcome to Tools! This is a modern, privacy-first online utility that runs 100% in your browser.\n\nWhether you need to count words for an essay, format a data document, or convert files, your data never leaves your device. No cloud servers are involved, and it works completely offline."
+  );
+  const [output, setOutput] = (0, import_react5.useState)({
+    words: 0,
+    characters: 0,
+    charactersNoSpaces: 0,
+    sentences: 0,
+    paragraphs: 0,
+    readingTimeMinutes: 0,
+    speakingTimeMinutes: 0
+  });
+  const [copied, setCopied] = (0, import_react5.useState)(false);
+  const [executionTime, setExecutionTime] = (0, import_react5.useState)(0);
+  const [, startTransition] = (0, import_react5.useTransition)();
+  const runAnalysis = (content) => {
+    const start = performance.now();
+    const res = executeTextAnalyzer({ text: content });
+    const end = performance.now();
+    setExecutionTime(end - start);
+    setOutput(res);
+  };
+  (0, import_react5.useEffect)(() => {
+    startTransition(() => {
+      runAnalysis(text);
+    });
+  }, [text]);
+  const handleCopy = async () => {
+    if (!text) return;
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2e3);
+  };
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      if (content) setText(content);
+    };
+    reader.readAsText(file);
+  };
+  const toUppercase = () => setText((prev) => prev.toUpperCase());
+  const toLowercase = () => setText((prev) => prev.toLowerCase());
+  const toTitleCase = () => setText(
+    (prev) => prev.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase())
+  );
+  const cleanExtraSpaces = () => setText((prev) => prev.replace(/[ \t]+/g, " ").replace(/\n\s*\n/g, "\n\n").trim());
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+    ToolShell,
+    {
+      tool,
+      onReset: () => setText(""),
+      executionTimeMs: executionTime,
+      inputData: { text },
+      outputData: output,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs text-slate-500 font-medium", children: "Words" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1", children: output.words.toLocaleString() })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs text-slate-500 font-medium", children: "Characters" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1", children: output.characters.toLocaleString() }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "text-[10px] text-slate-400 mt-0.5", children: [
+              output.charactersNoSpaces,
+              " without spaces"
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs text-slate-500 font-medium", children: "Sentences" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1", children: output.sentences })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs text-slate-500 font-medium", children: "Paragraphs" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1", children: output.paragraphs })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-1 text-xs text-slate-500 font-medium", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Clock, { className: "w-3.5 h-3.5 text-indigo-500" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Reading" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "text-xl sm:text-2xl font-bold text-slate-900 mt-1", children: [
+              "~",
+              output.readingTimeMinutes,
+              " ",
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs font-normal text-slate-500", children: "min" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-[10px] text-slate-400 mt-0.5", children: "at 200 WPM" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-1 text-xs text-slate-500 font-medium", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Mic, { className: "w-3.5 h-3.5 text-purple-500" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Speaking" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "text-xl sm:text-2xl font-bold text-slate-900 mt-1", children: [
+              "~",
+              output.speakingTimeMinutes,
+              " ",
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs font-normal text-slate-500", children: "min" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-[10px] text-slate-400 mt-0.5", children: "at 130 WPM" })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 p-3 border-b border-slate-100 bg-slate-50/70", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-1.5 flex-wrap", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs font-medium text-slate-500 mr-1 hidden sm:inline", children: "Transform:" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "secondary",
+                  size: "sm",
+                  onClick: toTitleCase,
+                  className: "text-xs h-7 px-2.5",
+                  children: "Title Case"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "secondary",
+                  size: "sm",
+                  onClick: toUppercase,
+                  className: "text-xs h-7 px-2.5",
+                  children: "UPPERCASE"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "secondary",
+                  size: "sm",
+                  onClick: toLowercase,
+                  className: "text-xs h-7 px-2.5",
+                  children: "lowercase"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "secondary",
+                  size: "sm",
+                  onClick: cleanExtraSpaces,
+                  className: "text-xs h-7 px-2.5",
+                  title: "Remove redundant spaces and duplicate blank lines",
+                  children: "Clean Spaces"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-1.5", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("label", { className: "cursor-pointer", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  "input",
+                  {
+                    type: "file",
+                    accept: ".txt,.md,.text",
+                    onChange: handleFileUpload,
+                    className: "hidden"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                  Button,
+                  {
+                    variant: "ghost",
+                    size: "sm",
+                    type: "button",
+                    className: "text-xs h-7 px-2 text-slate-600 gap-1",
+                    onClick: (e) => {
+                      const input = e.currentTarget.previousElementSibling;
+                      input?.click();
+                    },
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FileUp, { className: "w-3.5 h-3.5" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Upload" })
+                    ]
+                  }
+                )
+              ] }),
+              text && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "sm",
+                  onClick: () => setText(""),
+                  className: "text-xs h-7 px-2 text-slate-500 hover:text-rose-600",
+                  title: "Clear text",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Trash2, { className: "w-3.5 h-3.5" })
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Button,
+                {
+                  variant: "secondary",
+                  size: "sm",
+                  onClick: handleCopy,
+                  className: "text-xs h-7 px-3 gap-1.5",
+                  children: copied ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Check, { className: "w-3.5 h-3.5 text-emerald-600" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Copied" })
+                  ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Copy, { className: "w-3.5 h-3.5 text-slate-500" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Copy Text" })
+                  ] })
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            "textarea",
+            {
+              value: text,
+              onChange: (e) => setText(e.target.value),
+              placeholder: "Type or paste your text here to count words, characters, and estimate reading time...",
+              spellCheck: true,
+              className: "w-full h-80 sm:h-96 p-4 sm:p-6 text-sm sm:text-base leading-relaxed text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none"
+            }
+          )
+        ] })
+      ]
+    }
+  );
+};
+
+// src/tools/text-analyzer/definition.ts
+var TextAnalyzerInputSchema = external_exports.object({
+  text: external_exports.string().describe("The text to analyze and count")
+});
+var TextAnalyzerOutputSchema = external_exports.object({
+  words: external_exports.number().describe("Total word count"),
+  characters: external_exports.number().describe("Total character count including spaces"),
+  charactersNoSpaces: external_exports.number().describe("Character count excluding spaces"),
+  sentences: external_exports.number().describe("Estimated sentence count"),
+  paragraphs: external_exports.number().describe("Paragraph count"),
+  readingTimeMinutes: external_exports.number().describe("Estimated reading time in minutes (based on 200 WPM)"),
+  speakingTimeMinutes: external_exports.number().describe("Estimated speaking time in minutes (based on 130 WPM)")
+});
+var textAnalyzerTool = {
+  metadata: {
+    id: "text-analyzer",
+    name: "Word Counter & Text Analyzer",
+    category: "text",
+    description: "Instant word count, character count, sentences, paragraphs, and reading time estimates for writers, students, and everyday tasks.",
+    keywords: ["word counter", "character count", "words", "reading time", "text", "essay", "characters"],
+    version: "1.0.0",
+    icon: "FileText"
+  },
+  agent: {
+    mcp: true,
+    deepLink: true,
+    agentPrompt: "Analyze text to get word count, characters, sentence count, and reading time estimates."
+  },
+  inputSchema: TextAnalyzerInputSchema,
+  outputSchema: TextAnalyzerOutputSchema,
+  examples: [
+    {
+      title: "Sample Paragraph",
+      description: "Analyze an excerpt to inspect statistics",
+      input: {
+        text: "Antigravity is an AI pair programmer built for high craft software engineering. It operates autonomously to create, modify, and polish software with exceptional attention to detail. All tools run directly in your browser with complete privacy."
+      }
+    }
+  ],
+  execute: executeTextAnalyzer,
+  Component: TextAnalyzerUI
+};
+
+// src/tools/base64-converter/engine.ts
+function bytesToBase64(bytes) {
+  let binary = "";
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+function base64ToBytes(base64) {
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+function executeBase64Converter(input) {
+  const { text, mode, urlSafe } = input;
+  if (!text) {
+    return {
+      result: "",
+      isValid: true,
+      byteSize: 0
+    };
+  }
+  try {
+    if (mode === "encode") {
+      const bytes = new TextEncoder().encode(text);
+      let encoded = bytesToBase64(bytes);
+      if (urlSafe) {
+        encoded = encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      }
+      return {
+        result: encoded,
+        isValid: true,
+        byteSize: new Blob([encoded]).size
+      };
+    } else {
+      let sanitized = text.trim();
+      if (urlSafe || sanitized.includes("-") || sanitized.includes("_")) {
+        sanitized = sanitized.replace(/-/g, "+").replace(/_/g, "/");
+        while (sanitized.length % 4 !== 0) {
+          sanitized += "=";
+        }
+      }
+      const bytes = base64ToBytes(sanitized);
+      const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      return {
+        result: decoded,
+        isValid: true,
+        byteSize: new Blob([decoded]).size
+      };
+    }
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "Invalid Base64 sequence";
+    return {
+      result: text,
+      isValid: false,
+      error: errorMsg,
+      byteSize: new Blob([text]).size
+    };
+  }
+}
+
+// src/tools/base64-converter/ui.tsx
+var import_react7 = __toESM(require_react(), 1);
+
+// src/design-system/code-editor.tsx
+var import_react6 = __toESM(require_react(), 1);
+var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 var CodeEditor = ({
   label,
   value,
@@ -11049,11 +11375,11 @@ var CodeEditor = ({
   placeholder = "Enter input...",
   readOnly = false,
   actions,
-  height = "h-72 md:h-96",
-  language = "json",
-  filename = "output.json"
+  height = "h-64 sm:h-80 lg:h-96",
+  language = "text",
+  filename = "output.txt"
 }) => {
-  const [copied, setCopied] = (0, import_react5.useState)(false);
+  const [copied, setCopied] = (0, import_react6.useState)(false);
   const handleCopy = async () => {
     if (!value) return;
     await navigator.clipboard.writeText(value);
@@ -11071,11 +11397,11 @@ var CodeEditor = ({
     URL.revokeObjectURL(url);
   };
   const lineCount = value ? value.split("\n").length : 1;
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col rounded-xl border border-slate-800 bg-slate-900/90 shadow-sm overflow-hidden focus-within:border-slate-700 transition-colors", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center justify-between px-3.5 py-2 border-b border-slate-800 bg-slate-950/50", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-2", children: [
-        label && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs font-semibold tracking-wider uppercase text-slate-400", children: label }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "text-[11px] font-mono text-slate-500", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex flex-col rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex items-center justify-between px-3.5 py-2 border-b border-slate-100 bg-slate-50/70 select-none", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex items-center gap-2", children: [
+        label && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "text-xs font-semibold tracking-wider uppercase text-slate-600", children: label }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "text-[11px] font-mono text-slate-400", children: [
           lineCount,
           " ",
           lineCount === 1 ? "line" : "lines",
@@ -11084,49 +11410,49 @@ var CodeEditor = ({
           " bytes"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex items-center gap-1.5", children: [
         actions,
-        !readOnly && onChange && value && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        !readOnly && onChange && value && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           Button,
           {
             variant: "ghost",
             size: "sm",
             onClick: () => onChange(""),
             title: "Clear input",
-            className: "text-slate-400 hover:text-rose-400",
-            children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Trash2, { className: "w-3.5 h-3.5" })
+            className: "text-slate-500 hover:text-rose-600 hover:bg-rose-50 h-7 px-2",
+            children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Trash2, { className: "w-3.5 h-3.5" })
           }
         ),
-        readOnly && value && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        readOnly && value && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           Button,
           {
             variant: "ghost",
             size: "sm",
             onClick: handleDownload,
             title: "Download file",
-            className: "text-slate-400 hover:text-slate-200",
-            children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Download, { className: "w-3.5 h-3.5" })
+            className: "text-slate-500 hover:text-slate-800 h-7 px-2",
+            children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Download, { className: "w-3.5 h-3.5" })
           }
         ),
-        value && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        value && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           Button,
           {
             variant: "ghost",
             size: "sm",
             onClick: handleCopy,
-            className: "text-slate-400 hover:text-slate-200 gap-1.5",
-            children: copied ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Check, { className: "w-3.5 h-3.5 text-emerald-400" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs text-emerald-400", children: "Copied" })
-            ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Copy, { className: "w-3.5 h-3.5" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-xs", children: "Copy" })
+            className: "text-slate-600 hover:text-slate-900 h-7 px-2 gap-1.5",
+            children: copied ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Check, { className: "w-3.5 h-3.5 text-emerald-600" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "text-xs text-emerald-600 font-medium", children: "Copied" })
+            ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Copy, { className: "w-3.5 h-3.5" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "text-xs", children: "Copy" })
             ] })
           }
         )
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: `relative flex font-mono text-xs md:text-sm ${height}`, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: `relative flex font-mono text-xs sm:text-sm ${height}`, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       "textarea",
       {
         value,
@@ -11134,7 +11460,7 @@ var CodeEditor = ({
         readOnly,
         placeholder,
         spellCheck: false,
-        className: "w-full h-full p-3.5 bg-transparent text-slate-100 placeholder:text-slate-600 resize-none font-mono focus:outline-none leading-relaxed",
+        className: "w-full h-full p-3.5 bg-transparent text-slate-900 placeholder:text-slate-400 resize-none font-mono focus:outline-none leading-relaxed",
         "data-language": language
       }
     ) })
@@ -11142,21 +11468,21 @@ var CodeEditor = ({
 };
 
 // src/tools/base64-converter/ui.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var Base64ConverterUI = ({
   tool,
   initialInput
 }) => {
-  const [text, setText] = (0, import_react6.useState)(initialInput?.text || "Hello, World! \u{1F680}");
-  const [mode, setMode] = (0, import_react6.useState)(initialInput?.mode || "encode");
-  const [urlSafe, setUrlSafe] = (0, import_react6.useState)(initialInput?.urlSafe || false);
-  const [output, setOutput] = (0, import_react6.useState)({
+  const [text, setText] = (0, import_react7.useState)(initialInput?.text || "Hello World! \u{1F389}");
+  const [mode, setMode] = (0, import_react7.useState)(initialInput?.mode || "encode");
+  const [urlSafe, setUrlSafe] = (0, import_react7.useState)(initialInput?.urlSafe || false);
+  const [output, setOutput] = (0, import_react7.useState)({
     result: "",
     isValid: true,
     byteSize: 0
   });
-  const [executionTime, setExecutionTime] = (0, import_react6.useState)(0);
-  const [, startTransition] = (0, import_react6.useTransition)();
+  const [executionTime, setExecutionTime] = (0, import_react7.useState)(0);
+  const [, startTransition] = (0, import_react7.useTransition)();
   const runConverter = (t, m, u) => {
     const start = performance.now();
     const res = executeBase64Converter({ text: t, mode: m, urlSafe: u });
@@ -11164,7 +11490,7 @@ var Base64ConverterUI = ({
     setExecutionTime(end - start);
     setOutput(res);
   };
-  (0, import_react6.useEffect)(() => {
+  (0, import_react7.useEffect)(() => {
     startTransition(() => {
       runConverter(text, mode, urlSafe);
     });
@@ -11180,7 +11506,7 @@ var Base64ConverterUI = ({
     setOutput({ result: "", isValid: true, byteSize: 0 });
     setExecutionTime(0);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
     ToolShell,
     {
       tool,
@@ -11189,42 +11515,42 @@ var Base64ConverterUI = ({
       inputData: { text, mode, urlSafe },
       outputData: output,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex rounded-lg bg-slate-950 p-0.5 border border-slate-800", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-center gap-3 flex-wrap", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex rounded-lg bg-slate-100 p-0.5 border border-slate-200", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                 "button",
                 {
                   type: "button",
                   onClick: () => setMode("encode"),
-                  className: `text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${mode === "encode" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-slate-200"}`,
+                  className: `text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${mode === "encode" ? "bg-white text-indigo-600 font-semibold shadow-xs" : "text-slate-600 hover:text-slate-900"}`,
                   children: "Encode (Text \u2192 Base64)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                 "button",
                 {
                   type: "button",
                   onClick: () => setMode("decode"),
-                  className: `text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${mode === "decode" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-slate-200"}`,
+                  className: `text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${mode === "decode" ? "bg-white text-indigo-600 font-semibold shadow-xs" : "text-slate-600 hover:text-slate-900"}`,
                   children: "Decode (Base64 \u2192 Text)"
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("label", { className: "flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none hover:text-white", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none hover:text-slate-900", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                 "input",
                 {
                   type: "checkbox",
                   checked: urlSafe,
                   onChange: (e) => setUrlSafe(e.target.checked),
-                  className: "rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+                  className: "rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "URL-Safe Alphabet" })
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "URL-Safe Alphabet" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "flex items-center gap-2", children: output.isValid && output.result && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "flex items-center gap-2", children: output.isValid && output.result && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
             Button,
             {
               variant: "secondary",
@@ -11233,21 +11559,21 @@ var Base64ConverterUI = ({
               title: "Use output as next input and flip mode",
               className: "text-xs gap-1.5",
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ArrowLeftRight, { className: "w-3.5 h-3.5 text-indigo-400" }),
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "Swap Input / Output" })
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ArrowLeftRight, { className: "w-3.5 h-3.5 text-indigo-600" }),
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "Swap Input / Output" })
               ]
             }
           ) })
         ] }),
-        !output.isValid && output.error && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex items-start gap-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-200 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CircleAlert, { className: "w-4 h-4 text-rose-400 shrink-0 mt-0.5" }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "flex flex-col gap-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "font-semibold text-rose-300", children: "Base64 Decoding Error" }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "font-mono text-rose-200/90", children: output.error })
+        !output.isValid && output.error && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(CircleAlert, { className: "w-4 h-4 text-rose-600 shrink-0 mt-0.5" }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-col gap-0.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "font-semibold text-rose-900", children: "Base64 Decoding Error" }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "font-mono text-rose-700", children: output.error })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
             CodeEditor,
             {
               label: mode === "encode" ? "Raw Text (UTF-8)" : "Base64 Input",
@@ -11255,10 +11581,10 @@ var Base64ConverterUI = ({
               onChange: setText,
               placeholder: mode === "encode" ? "Type text to encode..." : "Paste Base64 to decode...",
               filename: mode === "encode" ? "input.txt" : "input.b64",
-              height: "h-80 lg:h-[450px]"
+              height: "h-64 sm:h-80 lg:h-[450px]"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
             CodeEditor,
             {
               label: mode === "encode" ? "Base64 Output" : "Decoded Text (UTF-8)",
@@ -11266,7 +11592,7 @@ var Base64ConverterUI = ({
               readOnly: true,
               placeholder: "Result will appear here...",
               filename: mode === "encode" ? "encoded.b64" : "decoded.txt",
-              height: "h-80 lg:h-[450px]"
+              height: "h-64 sm:h-80 lg:h-[450px]"
             }
           )
         ] })
@@ -11378,25 +11704,25 @@ function executeJsonFormatter(input) {
 }
 
 // src/tools/json-formatter/ui.tsx
-var import_react7 = __toESM(require_react(), 1);
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
+var import_react8 = __toESM(require_react(), 1);
+var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var JsonFormatterUI = ({
   tool,
   initialInput
 }) => {
-  const [rawJson, setRawJson] = (0, import_react7.useState)(
-    initialInput?.rawJson || '{\n  "title": "Tools Platform",\n  "status": "ready",\n  "mcp": true,\n  "tags": ["offline", "privacy", "fast"]\n}'
+  const [rawJson, setRawJson] = (0, import_react8.useState)(
+    initialInput?.rawJson || '{\n  "title": "Online Tools",\n  "offline": true,\n  "privacy": "100%",\n  "features": ["fast", "clean", "responsive"]\n}'
   );
-  const [indent, setIndent] = (0, import_react7.useState)(initialInput?.indent ?? 2);
-  const [sortKeys, setSortKeys] = (0, import_react7.useState)(initialInput?.sortKeys ?? false);
-  const [output, setOutput] = (0, import_react7.useState)({
+  const [indent, setIndent] = (0, import_react8.useState)(initialInput?.indent ?? 2);
+  const [sortKeys, setSortKeys] = (0, import_react8.useState)(initialInput?.sortKeys ?? false);
+  const [output, setOutput] = (0, import_react8.useState)({
     formatted: "",
     isValid: true,
     lineCount: 0,
     byteSize: 0
   });
-  const [executionTime, setExecutionTime] = (0, import_react7.useState)(0);
-  const [, startTransition] = (0, import_react7.useTransition)();
+  const [executionTime, setExecutionTime] = (0, import_react8.useState)(0);
+  const [, startTransition] = (0, import_react8.useTransition)();
   const runFormatter = (text, ind, sort) => {
     const start = performance.now();
     const res = executeJsonFormatter({ rawJson: text, indent: ind, sortKeys: sort });
@@ -11404,7 +11730,7 @@ var JsonFormatterUI = ({
     setExecutionTime(end - start);
     setOutput(res);
   };
-  (0, import_react7.useEffect)(() => {
+  (0, import_react8.useEffect)(() => {
     startTransition(() => {
       runFormatter(rawJson, indent, sortKeys);
     });
@@ -11432,7 +11758,7 @@ var JsonFormatterUI = ({
     setOutput({ formatted: "", isValid: true, lineCount: 0, byteSize: 0 });
     setExecutionTime(0);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
     ToolShell,
     {
       tool,
@@ -11441,56 +11767,56 @@ var JsonFormatterUI = ({
       inputData: { rawJson, indent, sortKeys },
       outputData: output,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-center gap-2 flex-wrap", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xs font-medium text-slate-400", children: "Indent:" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "flex rounded-lg bg-slate-950 p-0.5 border border-slate-800", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-center gap-2 sm:gap-3 flex-wrap", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "text-xs font-medium text-slate-500", children: "Indent:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "flex rounded-lg bg-slate-100 p-0.5 border border-slate-200", children: [
               { label: "2 Spaces", val: 2 },
               { label: "4 Spaces", val: 4 },
               { label: "Minify", val: 0 }
-            ].map((opt) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            ].map((opt) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
               "button",
               {
                 type: "button",
                 onClick: () => setIndent(opt.val),
-                className: `text-xs px-2.5 py-1 rounded-md transition-colors ${indent === opt.val ? "bg-indigo-600 text-white font-medium" : "text-slate-400 hover:text-slate-200"}`,
+                className: `text-xs px-2.5 py-1 rounded-md transition-colors cursor-pointer ${indent === opt.val ? "bg-white text-indigo-600 font-semibold shadow-xs" : "text-slate-600 hover:text-slate-900"}`,
                 children: opt.label
               },
               opt.val
             )) }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex items-center gap-2 text-xs text-slate-300 cursor-pointer ml-2 select-none hover:text-white", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "flex items-center gap-2 text-xs text-slate-600 cursor-pointer ml-1 select-none hover:text-slate-900", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
                 "input",
                 {
                   type: "checkbox",
                   checked: sortKeys,
                   onChange: (e) => setSortKeys(e.target.checked),
-                  className: "rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+                  className: "rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ArrowUpDown, { className: "w-3 h-3 text-slate-400" }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex items-center gap-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowUpDown, { className: "w-3 h-3 text-slate-400" }),
                 "Sort Keys"
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-center gap-2", children: [
-            tool.examples && tool.examples.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-center gap-1.5", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xs text-slate-500", children: "Presets:" }),
-              tool.examples.map((ex, idx) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-center gap-2", children: [
+            tool.examples && tool.examples.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "hidden sm:flex items-center gap-1.5", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "text-xs text-slate-400", children: "Presets:" }),
+              tool.examples.map((ex, idx) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
                 Button,
                 {
                   variant: "ghost",
                   size: "sm",
                   onClick: () => handleLoadExample(idx),
-                  className: "text-xs text-slate-400 hover:text-indigo-400 h-7 px-2",
+                  className: "text-xs text-slate-600 hover:text-indigo-600 h-7 px-2",
                   children: ex.title
                 },
                 ex.title
               ))
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "cursor-pointer", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "cursor-pointer", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
                 "input",
                 {
                   type: "file",
@@ -11499,7 +11825,7 @@ var JsonFormatterUI = ({
                   className: "hidden"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
                 Button,
                 {
                   variant: "secondary",
@@ -11511,23 +11837,23 @@ var JsonFormatterUI = ({
                     input?.click();
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(FileUp, { className: "w-3.5 h-3.5 text-slate-400" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "Load File" })
+                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(FileUp, { className: "w-3.5 h-3.5 text-slate-500" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "Load File" })
                   ]
                 }
               )
             ] })
           ] })
         ] }),
-        !output.isValid && output.error && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex items-start gap-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-200 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(CircleAlert, { className: "w-4 h-4 text-rose-400 shrink-0 mt-0.5" }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-col gap-0.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "font-semibold text-rose-300", children: "Invalid JSON Syntax" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "font-mono text-rose-200/90", children: output.error })
+        !output.isValid && output.error && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(CircleAlert, { className: "w-4 h-4 text-rose-600 shrink-0 mt-0.5" }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex flex-col gap-0.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "font-semibold text-rose-900", children: "Invalid JSON Syntax" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "font-mono text-rose-700", children: output.error })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
             CodeEditor,
             {
               label: "Raw Input JSON",
@@ -11535,27 +11861,27 @@ var JsonFormatterUI = ({
               onChange: setRawJson,
               placeholder: "Paste or type raw JSON here...",
               filename: "input.json",
-              height: "h-80 lg:h-[450px]"
+              height: "h-64 sm:h-80 lg:h-[450px]"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
             CodeEditor,
             {
               label: indent === 0 ? "Minified Output" : "Formatted Output",
               value: output.formatted,
               readOnly: true,
               filename: "formatted.json",
-              height: "h-80 lg:h-[450px]",
-              actions: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+              height: "h-64 sm:h-80 lg:h-[450px]",
+              actions: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
                 Button,
                 {
                   variant: "ghost",
                   size: "sm",
                   onClick: () => runFormatter(rawJson, indent, sortKeys),
-                  className: "text-xs text-indigo-400 hover:text-indigo-300 gap-1 h-6 px-2",
+                  className: "text-xs text-indigo-600 hover:text-indigo-700 gap-1 h-6 px-2",
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Play, { className: "w-3 h-3 fill-current" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "Re-run" })
+                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Play, { className: "w-3 h-3 fill-current" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "Re-run" })
                   ]
                 }
               )
@@ -11622,6 +11948,7 @@ var jsonFormatterTool = {
 };
 
 // src/tools/index.ts
+registry.register(textAnalyzerTool);
 registry.register(base64ConverterTool);
 registry.register(jsonFormatterTool);
 
@@ -11812,9 +12139,11 @@ lucide-react/dist/esm/icons/arrow-up-down.js:
 lucide-react/dist/esm/icons/bot.js:
 lucide-react/dist/esm/icons/check.js:
 lucide-react/dist/esm/icons/circle-alert.js:
+lucide-react/dist/esm/icons/clock.js:
 lucide-react/dist/esm/icons/copy.js:
 lucide-react/dist/esm/icons/download.js:
 lucide-react/dist/esm/icons/file-up.js:
+lucide-react/dist/esm/icons/mic.js:
 lucide-react/dist/esm/icons/play.js:
 lucide-react/dist/esm/icons/rotate-ccw.js:
 lucide-react/dist/esm/icons/share-2.js:

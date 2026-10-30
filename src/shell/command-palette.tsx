@@ -35,8 +35,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         e.preventDefault();
         if (isOpen) {
           onClose();
-        } else {
-          // Trigger open through callback if needed or handle in parent
         }
       }
     };
@@ -58,11 +56,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="m-auto rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 shadow-2xl p-0 w-full max-w-xl backdrop:bg-slate-950/80 backdrop:backdrop-blur-sm focus:outline-none"
+      className="m-auto rounded-2xl bg-white border border-slate-200 text-slate-900 shadow-2xl p-0 w-full max-w-xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs focus:outline-none"
     >
       <div className="flex flex-col">
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-800">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100">
           <Search className="w-5 h-5 text-slate-400 shrink-0" />
           <input
             type="text"
@@ -70,12 +68,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type a tool name, format, or keyword..."
-            className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+            className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
           />
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
             <X className="w-4 h-4" />
           </button>
@@ -96,35 +94,35 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onSelectTool(tool.metadata.id);
                   onClose();
                 }}
-                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/80 text-left transition-colors group"
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-left transition-colors group cursor-pointer"
               >
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-white group-hover:text-indigo-400">
+                    <span className="text-sm font-medium text-slate-900 group-hover:text-indigo-600">
                       {tool.metadata.name}
                     </span>
                     {tool.agent.mcp && (
-                      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800/50">
+                      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
                         <Bot className="w-2.5 h-2.5" />
-                        MCP
+                        Agent
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-slate-400 line-clamp-1">
+                  <span className="text-xs text-slate-500 line-clamp-1">
                     {tool.metadata.description}
                   </span>
                 </div>
 
-                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all shrink-0" />
               </button>
             ))
           )}
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/40 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Navigate with mouse or click</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-[10px]">
+        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500">
+          <span>Click to select</span>
+          <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-[10px]">
             ESC to close
           </kbd>
         </div>

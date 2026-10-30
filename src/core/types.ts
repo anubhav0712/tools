@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 
 export type ToolCategory =
+  | 'finance'
   | 'text'
   | 'converter'
   | 'developer'

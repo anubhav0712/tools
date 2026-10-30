@@ -6,6 +6,19 @@ import {
   Zap,
   Lock,
   Wrench,
+  Calculator,
+  TrendingUp,
+  PiggyBank,
+  CreditCard,
+  FileText,
+  Binary,
+  Code2,
+  DollarSign,
+  Coins,
+  Car,
+  ShieldAlert,
+  Flame,
+  Percent,
 } from 'lucide-react';
 import type { ToolDefinition } from '../core/types';
 
@@ -14,12 +27,34 @@ export interface CatalogGridProps {
   onSelectTool: (toolId: string) => void;
 }
 
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Calculator,
+  TrendingUp,
+  PiggyBank,
+  CreditCard,
+  FileText,
+  Binary,
+  Code2,
+  DollarSign,
+  Coins,
+  Car,
+  ShieldAlert,
+  Flame,
+  Percent,
+  Wrench,
+};
+
+function getToolIcon(iconName: string): React.ComponentType<{ className?: string }> {
+  return ICON_MAP[iconName] || Wrench;
+}
+
 export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories: Array<{ id: string; label: string }> = [
     { id: 'all', label: 'All Tools' },
+    { id: 'finance', label: 'Finance & Calculators' },
     { id: 'text', label: 'Text & Writing' },
     { id: 'converter', label: 'Converters' },
     { id: 'developer', label: 'Developer & Data' },
@@ -50,7 +85,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
         </h1>
 
         <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-          Everyday utilities, text formatters, converters, and developer tools that run entirely in your browser. No files leave your computer.
+          Everyday utilities, smart finance calculators, text formatters, and developer tools that run entirely in your browser. Fast, private, and zero cloud uploads.
         </p>
 
         {/* Feature Pills */}
@@ -115,7 +150,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100/80 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <Wrench className="w-5 h-5" />
+                    {React.createElement(getToolIcon(tool.metadata.icon), { className: 'w-5 h-5' })}
                   </div>
                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono capitalize">
                     {tool.metadata.category}

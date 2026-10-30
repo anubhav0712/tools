@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, Bot, ArrowRight, X } from 'lucide-react';
+import { Search, ArrowRight, X } from 'lucide-react';
 import type { ToolDefinition } from '../core/types';
 
 export interface CommandPaletteProps {
@@ -101,12 +101,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     <span className="text-sm font-medium text-slate-900 group-hover:text-indigo-600">
                       {tool.metadata.name}
                     </span>
-                    {tool.agent.mcp && (
-                      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
-                        <Bot className="w-2.5 h-2.5" />
-                        Agent
-                      </span>
-                    )}
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono capitalize">
+                      {tool.metadata.category}
+                    </span>
                   </div>
                   <span className="text-xs text-slate-500 line-clamp-1">
                     {tool.metadata.description}

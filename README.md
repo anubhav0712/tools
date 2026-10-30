@@ -1,19 +1,19 @@
 # Tools
 
-> **Privacy-first, 100% client-side, agent-ready developer & data utility suite.**
+> **Fast, minimal, and 100% in-browser online tools suite. Completely private, free, and offline-ready.**
 
-All tools run **entirely in your browser sandbox**. Zero backend servers, zero cloud API calls, zero tracking, and complete data privacy. Every tool is built with a typed contract (Zod schemas) so it can be used seamlessly by both human engineers and AI agents via Model Context Protocol (MCP).
+All tools run **entirely in your browser sandbox**. Zero backend servers, zero cloud API calls, zero tracking, and complete data privacy. Designed with a clean light theme, mobile-friendly responsive layout, and an extensible architecture to add new tools effortlessly.
 
 ---
 
 ## Key Features
 
-- 🔒 **100% Client-Side**: All parsing, formatting, transformations, and compute run in-browser via pure TypeScript and Web Workers.
-- 🤖 **Agent & MCP Ready**: Tools with `agent: { mcp: true }` are automatically validated, exported into `/mcp-manifest.json`, and expose structured context copy actions for LLM agents.
-- 🎨 **Unified Design System**: Cohesive design tokens built with Tailwind CSS v4 and modern semantic CSS variables (`color-scheme: dark`).
-- ⚡ **Instant Deep-Linking**: Share exact tool states via URL hashes (`#tool=json-formatter&input=...`) without server-side routing issues on GitHub Pages.
-- 🚀 **GitHub Pages Ready**: Out-of-the-box GitHub Actions workflow (`.github/workflows/deploy.yml`) for continuous deployment.
-- 🛠️ **CLI Scaffolding**: Add a new tool in 5 seconds with `npm run new-tool <tool-id>`.
+- 🔒 **100% In-Browser & Private**: All parsing, formatting, text analysis, and data conversions execute strictly on your device. Zero data is ever sent to a server.
+- ☀️ **Clean Minimal Light Theme**: Polished typography, accessible controls, and soft neutral styling designed for everyday users and professionals alike.
+- 📱 **Mobile & Multi-Device Ready**: Fluidly adapts across smartphones, tablets, and desktop displays.
+- ⚡ **Instant Deep-Linking**: Share exact tool states via URL hashes (`#tool=text-analyzer&input=...`) with no server routing or 404 errors.
+- 🚀 **GitHub Pages CI/CD**: Automatic zero-downtime deployment on every push to `main` via GitHub Actions.
+- 🛠️ **CLI Scaffolding**: Add a new tool in seconds with `npm run new-tool <tool-id>`.
 
 ---
 
@@ -25,13 +25,13 @@ All tools run **entirely in your browser sandbox**. Zero backend servers, zero c
 # Install dependencies
 npm install
 
-# Start local development server with Vite HMR
+# Start local development server with instant HMR
 npm run dev
 
 # Run unit tests with Vitest
 npm test
 
-# Build static bundle & export MCP manifest for production
+# Build static production bundle
 npm run build
 
 # Preview production build locally
@@ -42,22 +42,19 @@ npm run preview
 
 ## Developing & Adding New Tools
 
-The platform makes adding new tools frictionless through standardized plugins.
+Adding a new tool is straightforward and assisted by the built-in generator:
 
 ### Step 1: Scaffold with the CLI
 
 ```bash
 npm run new-tool <tool-id>
-# Example: npm run new-tool jwt-decoder
+# Example: npm run new-tool unit-converter
 ```
 
-The interactive prompt asks:
+The interactive prompt asks for:
 1. **Name**: Human-readable title
-2. **Category**: `developer` | `data` | `crypto` | `text` | `converter` | `visual`
+2. **Category**: `text` | `converter` | `developer` | `crypto` | `everyday`
 3. **Description**: Concise tool summary
-4. **Is this tool MCP / Agent ready? (y/n)**:
-   - **`y`**: Generates typed Zod `inputSchema`, `outputSchema`, headless `engine.ts`, and Vitest unit tests.
-   - **`n`**: Generates an interactive GUI-only tool definition.
 
 ### Step 2: Anatomy of a Tool
 
@@ -65,49 +62,10 @@ Each tool lives in its own self-contained directory under `src/tools/<tool-id>/`
 
 ```
 src/tools/<tool-id>/
-├── definition.ts    # Metadata, category, agent config, and Zod schemas
-├── engine.ts        # Pure, deterministic headless execution logic
-├── engine.test.ts   # Unit tests verifying edge cases
+├── definition.ts    # Tool metadata and TypeScript interfaces
+├── engine.ts        # Pure, deterministic logic (runnable in Node or browser)
+├── engine.test.ts   # Vitest unit tests verifying edge cases
 └── ui.tsx           # React UI wrapped in <ToolShell>
-```
-
-#### Example Tool Definition (`definition.ts`):
-
-```typescript
-import { z } from 'zod';
-import type { ToolDefinition } from '../../core/types';
-import { executeJsonFormatter } from './engine';
-import { JsonFormatterUI } from './ui';
-
-export const JsonFormatterInputSchema = z.object({
-  rawJson: z.string().describe('The raw JSON string to format'),
-  indent: z.number().default(2),
-});
-
-export const JsonFormatterOutputSchema = z.object({
-  formatted: z.string(),
-  isValid: z.boolean(),
-});
-
-export const jsonFormatterTool: ToolDefinition = {
-  metadata: {
-    id: 'json-formatter',
-    name: 'JSON Formatter & Validator',
-    category: 'developer',
-    description: 'Format, validate, or minify JSON data locally.',
-    keywords: ['json', 'format', 'minify'],
-    version: '1.0.0',
-    icon: 'Braces',
-  },
-  agent: {
-    mcp: true,
-    deepLink: true,
-  },
-  inputSchema: JsonFormatterInputSchema,
-  outputSchema: JsonFormatterOutputSchema,
-  execute: executeJsonFormatter,
-  Component: JsonFormatterUI,
-};
 ```
 
 ---
@@ -122,67 +80,38 @@ tools/
 ├── tsconfig.json
 ├── vite.config.ts
 ├── scripts/
-│   ├── new-tool.ts              # Interactive scaffolding CLI
-│   └── export-mcp.ts            # MCP manifest exporter
+│   └── new-tool.ts              # Interactive tool scaffolding CLI
 └── src/
     ├── main.tsx                 # React DOM mount point
-    ├── app.tsx                  # Shell coordinator & hash router
+    ├── app.tsx                  # App shell coordinator & hash router
     ├── core/
-    │   ├── types.ts             # ToolDefinition, Metadata, AgentConfig
+    │   ├── types.ts             # ToolDefinition, Metadata, Categories
     │   ├── registry.ts          # Central tool registry
-    │   ├── url-state.ts         # Hash-based deep link serializer
-    │   └── mcp-generator.ts     # Generates MCP JSON definitions
+    │   └── url-state.ts         # Hash-based deep link serializer
     ├── design-system/
-    │   ├── theme.css            # Tailwind CSS v4 & theme tokens
+    │   ├── theme.css            # Tailwind CSS v4 & semantic theme tokens
     │   ├── tool-shell.tsx       # Standard tool container wrapper
     │   ├── button.tsx           # Accessible button variants
-    │   ├── badge.tsx            # Status & capability pills
-    │   └── code-editor.tsx      # Monaco/code style editor
+    │   ├── badge.tsx            # Status pills
+    │   └── code-editor.tsx      # Clean editor viewport
     ├── shell/
     │   ├── header.tsx           # Global navigation & status
     │   ├── catalog-grid.tsx     # Homepage tool gallery
     │   └── command-palette.tsx  # Cmd+K search modal
     └── tools/
-        ├── index.ts             # Tool auto-registration index
-        └── json-formatter/      # Gold-standard reference tool
-            ├── definition.ts
-            ├── engine.ts
-            ├── engine.test.ts
-            └── ui.tsx
+        ├── index.ts             # Central tool registry index
+        ├── text-analyzer/       # Word counter & text statistics
+        ├── json-formatter/      # JSON formatter, validator & minifier
+        └── base64-converter/    # Base64 encoder/decoder
 ```
 
 ---
 
-## CI/CD & Deployment Workflows
+## Deployment to GitHub Pages
 
-This repository features two fully automated GitHub Actions workflows:
-
-### 1. Website Deployment (`.github/workflows/deploy.yml`)
-- **Trigger**: Every push to `main`.
-- **What it does**: Runs all 13+ unit tests, builds the static website with relative asset paths, and deploys to **GitHub Pages** (`https://anubhav0712.github.io/tools/`).
-- **One-time Setup**: In your GitHub repo, go to **Settings > Pages** and set **Source** to **GitHub Actions**.
-
-### 2. NPM / NPX Package Publishing (`.github/workflows/publish-npm.yml`)
-- **Trigger**: Push to `main` (when version changes) or manual workflow dispatch.
-- **What it does**: Inspects `@anubhav0712/tools-mcp` version. If it's a new version, automatically bundles the standalone zero-dependency executable (`bin/tools-mcp.cjs`) and publishes to npm with supply-chain provenance.
-- **One-time Setup**: Add your `NPM_TOKEN` secret in **Settings > Secrets and variables > Actions**.
-
----
-
-## Running with AI Agents via NPX
-
-Once published, anyone can connect all tools to **Claude Desktop**, **Cursor**, or custom agents:
-
-```json
-{
-  "mcpServers": {
-    "tools": {
-      "command": "npx",
-      "args": ["-y", "@anubhav0712/tools-mcp"]
-    }
-  }
-}
-```
+1. In your GitHub repository, navigate to **Settings > Pages**.
+2. Under **Build and deployment > Source**, select **GitHub Actions**.
+3. Push your commits to `main`. The `.github/workflows/deploy.yml` pipeline will automatically test, build, and deploy your site to `https://anubhav0712.github.io/tools/`.
 
 ---
 

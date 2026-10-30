@@ -71,7 +71,6 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
       onReset={handleReset}
       executionTimeMs={executionTime}
       inputData={{ rawJson, indent, sortKeys }}
-      outputData={output}
     >
       {/* Controls & Presets Ribbon */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">

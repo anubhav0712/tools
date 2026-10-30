@@ -1,30 +1,22 @@
-import { z } from 'zod';
 import type { ToolDefinition } from '../../core/types';
 import { executeJsonFormatter } from './engine';
 import { JsonFormatterUI } from './ui';
 
-export const JsonFormatterInputSchema = z.object({
-  rawJson: z.string().describe('The raw JSON string to format, validate, or minify'),
-  indent: z.number().min(0).max(8).default(2).describe('Indentation spaces (0 for minification, default 2)'),
-  sortKeys: z.boolean().default(false).describe('Whether to sort JSON object keys alphabetically'),
-});
+export interface JsonFormatterInput {
+  rawJson: string;
+  indent?: number;
+  sortKeys?: boolean;
+}
 
-export type JsonFormatterInput = z.infer<typeof JsonFormatterInputSchema>;
+export interface JsonFormatterOutput {
+  formatted: string;
+  isValid: boolean;
+  error?: string;
+  lineCount: number;
+  byteSize: number;
+}
 
-export const JsonFormatterOutputSchema = z.object({
-  formatted: z.string().describe('Formatted or minified JSON string'),
-  isValid: z.boolean().describe('Whether the input was valid JSON'),
-  error: z.string().optional().describe('Error message if invalid'),
-  lineCount: z.number().describe('Number of lines in the output'),
-  byteSize: z.number().describe('Output size in bytes'),
-});
-
-export type JsonFormatterOutput = z.infer<typeof JsonFormatterOutputSchema>;
-
-export const jsonFormatterTool: ToolDefinition<
-  typeof JsonFormatterInputSchema,
-  typeof JsonFormatterOutputSchema
-> = {
+export const jsonFormatterTool: ToolDefinition<JsonFormatterInput, JsonFormatterOutput> = {
   metadata: {
     id: 'json-formatter',
     name: 'JSON Formatter & Validator',
@@ -34,13 +26,6 @@ export const jsonFormatterTool: ToolDefinition<
     version: '1.0.0',
     icon: 'Braces',
   },
-  agent: {
-    mcp: true,
-    deepLink: true,
-    agentPrompt: 'Use this tool to safely format, validate, minify, or canonicalize JSON payloads without sending data to external APIs.',
-  },
-  inputSchema: JsonFormatterInputSchema,
-  outputSchema: JsonFormatterOutputSchema,
   examples: [
     {
       title: 'Simple User Object',

@@ -1,29 +1,21 @@
-import { z } from 'zod';
 import type { ToolDefinition } from '../../core/types';
 import { executeBase64Converter } from './engine';
 import { Base64ConverterUI } from './ui';
 
-export const Base64ConverterInputSchema = z.object({
-  text: z.string().describe('Text or Base64 string to encode/decode'),
-  mode: z.enum(['encode', 'decode']).default('encode').describe('Operation mode: encode or decode'),
-  urlSafe: z.boolean().default(false).describe('Use URL-safe alphabet (- and _ instead of + and /)'),
-});
+export interface Base64ConverterInput {
+  text: string;
+  mode?: 'encode' | 'decode';
+  urlSafe?: boolean;
+}
 
-export type Base64ConverterInput = z.infer<typeof Base64ConverterInputSchema>;
+export interface Base64ConverterOutput {
+  result: string;
+  isValid: boolean;
+  error?: string;
+  byteSize: number;
+}
 
-export const Base64ConverterOutputSchema = z.object({
-  result: z.string().describe('Encoded or decoded string'),
-  isValid: z.boolean().describe('Whether the operation succeeded'),
-  error: z.string().optional().describe('Error message if decoding failed'),
-  byteSize: z.number().describe('Byte length of the result'),
-});
-
-export type Base64ConverterOutput = z.infer<typeof Base64ConverterOutputSchema>;
-
-export const base64ConverterTool: ToolDefinition<
-  typeof Base64ConverterInputSchema,
-  typeof Base64ConverterOutputSchema
-> = {
+export const base64ConverterTool: ToolDefinition<Base64ConverterInput, Base64ConverterOutput> = {
   metadata: {
     id: 'base64-converter',
     name: 'Base64 Encoder & Decoder',
@@ -33,13 +25,6 @@ export const base64ConverterTool: ToolDefinition<
     version: '1.0.0',
     icon: 'Binary',
   },
-  agent: {
-    mcp: true,
-    deepLink: true,
-    agentPrompt: 'Encode plain text to Base64 or decode Base64 strings back to UTF-8 text.',
-  },
-  inputSchema: Base64ConverterInputSchema,
-  outputSchema: Base64ConverterOutputSchema,
   examples: [
     {
       title: 'Encode Greeting',

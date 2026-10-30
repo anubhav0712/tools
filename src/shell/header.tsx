@@ -1,18 +1,15 @@
 import React from 'react';
-import { Wrench, ShieldCheck, Search, Github, Bot } from 'lucide-react';
-import { Button } from '../design-system/button';
+import { Wrench, ShieldCheck, Search, Github } from 'lucide-react';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
   onHomeClick: () => void;
-  onOpenAgentConnect: () => void;
   currentToolName?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
   onHomeClick,
-  onOpenAgentConnect,
   currentToolName,
 }) => {
   return (
@@ -66,23 +63,11 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="agent"
-            size="sm"
-            onClick={onOpenAgentConnect}
-            className="text-xs h-8 px-2.5 sm:px-3 gap-1.5 font-medium"
-            title="Connect tools to Claude, Cursor, or AI agents via MCP"
-          >
-            <Bot className="w-3.5 h-3.5 text-purple-600" />
-            <span className="hidden sm:inline">Use with AI Agent</span>
-            <span className="sm:hidden">Agent</span>
-          </Button>
-
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={onOpenSearch}
-            className="sm:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className="sm:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer"
             title="Search"
           >
             <Search className="w-4 h-4" />
@@ -94,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <a
-            href="https://github.com"
+            href="https://github.com/anubhav0712/tools"
             target="_blank"
             rel="noreferrer"
             className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"

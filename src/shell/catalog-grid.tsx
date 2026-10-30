@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import {
   Search,
-  Bot,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Zap,
   Lock,
   Wrench,
 } from 'lucide-react';
-import { Badge } from '../design-system/badge';
 import type { ToolDefinition } from '../core/types';
 
 export interface CatalogGridProps {
@@ -20,18 +17,15 @@ export interface CatalogGridProps {
 export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [agentReadyOnly, setAgentReadyOnly] = useState<boolean>(false);
 
   const categories: Array<{ id: string; label: string }> = [
     { id: 'all', label: 'All Tools' },
     { id: 'text', label: 'Text & Writing' },
     { id: 'converter', label: 'Converters' },
     { id: 'developer', label: 'Developer & Data' },
-    { id: 'crypto', label: 'Security & Privacy' },
   ];
 
   const filteredTools = tools.filter((tool) => {
-    if (agentReadyOnly && !tool.agent.mcp) return false;
     if (selectedCategory !== 'all' && tool.metadata.category !== selectedCategory) return false;
 
     if (!searchQuery.trim()) return true;
@@ -67,11 +61,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-2xs">
             <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Works Offline</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-2xs">
-            <Bot className="w-3.5 h-3.5 text-purple-600" />
-            <span>AI Agent & MCP Ready</span>
+            <span>Works Completely Offline</span>
           </div>
         </div>
       </div>
@@ -96,31 +86,16 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
           ))}
         </div>
 
-        {/* Search & Agent Filter */}
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <label className="flex items-center gap-2 text-xs text-slate-600 hover:text-slate-900 cursor-pointer select-none whitespace-nowrap">
-            <input
-              type="checkbox"
-              checked={agentReadyOnly}
-              onChange={(e) => setAgentReadyOnly(e.target.checked)}
-              className="rounded border-slate-300 bg-white text-purple-600 focus:ring-purple-500 h-3.5 w-3.5"
-            />
-            <span className="flex items-center gap-1">
-              <Bot className="w-3.5 h-3.5 text-purple-600" />
-              Agent Ready Only
-            </span>
-          </label>
-
-          <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search tools..."
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-2xs"
-            />
-          </div>
+        {/* Search */}
+        <div className="relative flex-1 sm:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search tools..."
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-2xs"
+          />
         </div>
       </div>
 
@@ -142,19 +117,9 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
                   <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100/80 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <Wrench className="w-5 h-5" />
                   </div>
-                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                    {tool.agent.mcp ? (
-                      <Badge variant="agent">
-                        <Bot className="w-3 h-3 text-purple-600" />
-                        <span>Agent</span>
-                      </Badge>
-                    ) : (
-                      <Badge variant="gui">
-                        <Sparkles className="w-3 h-3 text-emerald-600" />
-                        <span>Interactive</span>
-                      </Badge>
-                    )}
-                  </div>
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono capitalize">
+                    {tool.metadata.category}
+                  </span>
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -168,8 +133,8 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
               </div>
 
               <div className="pt-3.5 mt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span className="capitalize font-mono text-[11px] text-slate-500">
-                  {tool.metadata.category}
+                <span className="font-mono text-[11px] text-slate-400">
+                  v{tool.metadata.version}
                 </span>
                 <span className="inline-flex items-center gap-1 font-medium text-indigo-600 group-hover:translate-x-0.5 transition-transform">
                   Open Tool

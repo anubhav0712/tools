@@ -77,7 +77,6 @@ export const TextAnalyzerUI: React.FC<ToolComponentProps<TextAnalyzerInput, Text
       onReset={() => setText('')}
       executionTimeMs={executionTime}
       inputData={{ text }}
-      outputData={output}
     >
       {/* Metric Cards Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">

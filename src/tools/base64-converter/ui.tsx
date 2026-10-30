@@ -55,7 +55,6 @@ export const Base64ConverterUI: React.FC<ToolComponentProps<Base64ConverterInput
       onReset={handleReset}
       executionTimeMs={executionTime}
       inputData={{ text, mode, urlSafe }}
-      outputData={output}
     >
       {/* Controls Ribbon */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">

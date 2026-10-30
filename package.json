@@ -1,37 +1,16 @@
 {
-  "name": "@anubhav0712/tools-mcp",
+  "name": "tools",
+  "private": true,
   "version": "0.1.0",
-  "description": "100% In-Browser & Local-First Utility Tools with Stdio MCP Server for AI Agents",
+  "description": "Fast, private, 100% in-browser online tools suite",
   "type": "module",
-  "author": "anubhav0712",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/anubhav0712/tools.git"
-  },
-  "homepage": "https://anubhav0712.github.io/tools/",
   "scripts": {
     "dev": "vite",
-    "build": "npm run export-mcp && npm run build:cli && npm run build:web",
-    "build:cli": "tsx scripts/build-mcp-cli.ts",
-    "build:web": "tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "new-tool": "tsx scripts/new-tool.ts",
-    "export-mcp": "tsx scripts/export-mcp.ts",
-    "mcp": "tsx scripts/mcp-server.ts"
-  },
-  "bin": {
-    "tools-mcp": "./bin/tools-mcp.cjs"
-  },
-  "files": [
-    "bin",
-    "public/mcp-manifest.json",
-    "README.md"
-  ],
-  "publishConfig": {
-    "access": "public"
+    "new-tool": "tsx scripts/new-tool.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -39,8 +18,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
-    "zod": "^3.24.2",
-    "zod-to-json-schema": "^3.25.2"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.6",

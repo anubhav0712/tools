@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { registry } from './core/registry';
 import { parseUrlState, setUrlTool } from './core/url-state';
-import { generateMcpManifest } from './core/mcp-generator';
 import { Header } from './shell/header';
 import { CatalogGrid } from './shell/catalog-grid';
 import { CommandPalette } from './shell/command-palette';
-import { AgentConnectModal } from './shell/agent-connect-modal';
 // Import tools to ensure they are registered
 import './tools';
 
@@ -13,7 +11,6 @@ export const App: React.FC = () => {
   const [activeToolId, setActiveToolId] = useState<string | null>(null);
   const [initialInput, setInitialInput] = useState<unknown>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isAgentConnectOpen, setIsAgentConnectOpen] = useState(false);
 
   // Synchronize state with URL hash
   useEffect(() => {
@@ -62,7 +59,6 @@ export const App: React.FC = () => {
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
         onHomeClick={handleHomeClick}
-        onOpenAgentConnect={() => setIsAgentConnectOpen(true)}
         currentToolName={activeTool?.metadata.name}
       />
 
@@ -89,13 +85,6 @@ export const App: React.FC = () => {
         onSelectTool={handleSelectTool}
       />
 
-      {/* Agent Connect Modal */}
-      <AgentConnectModal
-        isOpen={isAgentConnectOpen}
-        onClose={() => setIsAgentConnectOpen(false)}
-        tools={allTools}
-      />
-
       {/* Global Footer */}
       <footer className="w-full border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -103,39 +92,13 @@ export const App: React.FC = () => {
             Tools — 100% In-Browser. Zero cloud upload. Total privacy.
           </p>
           <div className="flex items-center gap-4 text-slate-600">
-            <button
-              type="button"
-              onClick={() => setIsAgentConnectOpen(true)}
-              className="hover:text-purple-600 transition-colors cursor-pointer"
-            >
-              Use with AI Agent
-            </button>
-            <span>•</span>
-            <button
-              type="button"
-              onClick={() => {
-                const manifest = generateMcpManifest();
-                const json = JSON.stringify(manifest, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'mcp-tools-manifest.json';
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-              className="hover:text-indigo-600 transition-colors cursor-pointer"
-            >
-              Export MCP Manifest
-            </button>
-            <span>•</span>
             <a
-              href="https://github.com"
+              href="https://github.com/anubhav0712/tools"
               target="_blank"
               rel="noreferrer"
               className="hover:text-slate-900 transition-colors"
             >
-              GitHub
+              GitHub Repository
             </a>
           </div>
         </div>

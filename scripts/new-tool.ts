@@ -8,19 +8,16 @@ function parseArgs() {
   let name = '';
   let category = '';
   let description = '';
-  let mcp: boolean | null = null;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--name' && args[i + 1]) name = args[++i];
     else if (arg === '--category' && args[i + 1]) category = args[++i];
     else if (arg === '--description' && args[i + 1]) description = args[++i];
-    else if (arg === '--mcp') mcp = true;
-    else if (arg === '--no-mcp') mcp = false;
     else if (!arg.startsWith('-') && !id) id = arg;
   }
 
-  return { id, name, category, description, mcp };
+  return { id, name, category, description };
 }
 
 function toPascalCase(str: string): string {
@@ -60,7 +57,7 @@ async function main() {
 
   let toolId = parsed.id;
   if (!toolId) {
-    toolId = await ask('Enter tool ID (kebab-case, e.g. "base64-converter")');
+    toolId = await ask('Enter tool ID (kebab-case, e.g. "case-converter")');
   }
 
   toolId = toolId.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-');
@@ -77,14 +74,8 @@ async function main() {
 
   const defaultName = toTitleCase(toolId);
   const toolName = parsed.name || (await ask('Human-readable Name', defaultName));
-  const category = parsed.category || (await ask('Category (developer | data | crypto | text | converter | visual)', 'developer'));
-  const description = parsed.description || (await ask('Brief Description', `Fast and local ${toolName} running 100% in your browser.`));
-  
-  let isMcp = parsed.mcp;
-  if (isMcp === null) {
-    const isMcpAnswer = await ask('Is this tool MCP / Agent ready? (y/n)', 'y');
-    isMcp = isMcpAnswer.toLowerCase().startsWith('y');
-  }
+  const category = parsed.category || (await ask('Category (text | converter | developer | crypto | everyday)', 'everyday'));
+  const description = parsed.description || (await ask('Brief Description', `Fast and private ${toolName} running 100% in your browser.`));
 
   if (rl) {
     (rl as readline.Interface).close();
@@ -96,28 +87,19 @@ async function main() {
   fs.mkdirSync(toolDir, { recursive: true });
 
   // 1. Generate definition.ts
-  const definitionContent = isMcp
-    ? `import { z } from 'zod';
-import type { ToolDefinition } from '../../core/types';
+  const definitionContent = `import type { ToolDefinition } from '../../core/types';
 import { execute${pascalName} } from './engine';
 import { ${pascalName}UI } from './ui';
 
-export const ${pascalName}InputSchema = z.object({
-  input: z.string().describe('Input string to process'),
-});
+export interface ${pascalName}Input {
+  input: string;
+}
 
-export type ${pascalName}Input = z.infer<typeof ${pascalName}InputSchema>;
+export interface ${pascalName}Output {
+  result: string;
+}
 
-export const ${pascalName}OutputSchema = z.object({
-  result: z.string().describe('Processed result'),
-});
-
-export type ${pascalName}Output = z.infer<typeof ${pascalName}OutputSchema>;
-
-export const ${camelName}Tool: ToolDefinition<
-  typeof ${pascalName}InputSchema,
-  typeof ${pascalName}OutputSchema
-> = {
+export const ${camelName}Tool: ToolDefinition<${pascalName}Input, ${pascalName}Output> = {
   metadata: {
     id: '${toolId}',
     name: '${toolName}',
@@ -127,62 +109,33 @@ export const ${camelName}Tool: ToolDefinition<
     version: '1.0.0',
     icon: 'Wrench',
   },
-  agent: {
-    mcp: true,
-    deepLink: true,
-    agentPrompt: 'Use this tool to execute ${toolName} operations locally.',
-  },
-  inputSchema: ${pascalName}InputSchema,
-  outputSchema: ${pascalName}OutputSchema,
   examples: [
     {
       title: 'Default Example',
-      description: 'Sample run',
+      description: 'Sample input',
       input: {
-        input: 'Sample payload',
+        input: 'Sample text',
       },
     },
   ],
   execute: execute${pascalName},
   Component: ${pascalName}UI,
 };
-`
-    : `import type { ToolDefinition } from '../../core/types';
-import { ${pascalName}UI } from './ui';
-
-export const ${camelName}Tool: ToolDefinition = {
-  metadata: {
-    id: '${toolId}',
-    name: '${toolName}',
-    category: '${category}' as any,
-    description: '${description}',
-    keywords: ['${toolId}', '${category}'],
-    version: '1.0.0',
-    icon: 'Sparkles',
-  },
-  agent: {
-    mcp: false,
-    deepLink: true,
-  },
-  Component: ${pascalName}UI,
-};
 `;
-
   fs.writeFileSync(path.join(toolDir, 'definition.ts'), definitionContent, 'utf-8');
 
-  // 2. Generate engine.ts & engine.test.ts (if MCP ready)
-  if (isMcp) {
-    const engineContent = `import type { ${pascalName}Input, ${pascalName}Output } from './definition';
+  // 2. Generate engine.ts & engine.test.ts
+  const engineContent = `import type { ${pascalName}Input, ${pascalName}Output } from './definition';
 
 export function execute${pascalName}(input: ${pascalName}Input): ${pascalName}Output {
   return {
-    result: input.input.toUpperCase(),
+    result: (input.input || '').toUpperCase(),
   };
 }
 `;
-    fs.writeFileSync(path.join(toolDir, 'engine.ts'), engineContent, 'utf-8');
+  fs.writeFileSync(path.join(toolDir, 'engine.ts'), engineContent, 'utf-8');
 
-    const testContent = `import { describe, it, expect } from 'vitest';
+  const testContent = `import { describe, it, expect } from 'vitest';
 import { execute${pascalName} } from './engine';
 
 describe('${toolName} Engine', () => {
@@ -192,27 +145,27 @@ describe('${toolName} Engine', () => {
   });
 });
 `;
-    fs.writeFileSync(path.join(toolDir, 'engine.test.ts'), testContent, 'utf-8');
-  }
+  fs.writeFileSync(path.join(toolDir, 'engine.test.ts'), testContent, 'utf-8');
 
   // 3. Generate ui.tsx
   const uiContent = `import React, { useState } from 'react';
 import { ToolShell } from '../../design-system/tool-shell';
 import { CodeEditor } from '../../design-system/code-editor';
 import type { ToolComponentProps } from '../../core/types';
-${isMcp ? `import { execute${pascalName} } from './engine';\nimport type { ${pascalName}Input, ${pascalName}Output } from './definition';` : ''}
+import { execute${pascalName} } from './engine';
+import type { ${pascalName}Input, ${pascalName}Output } from './definition';
 
-export const ${pascalName}UI: React.FC<ToolComponentProps<${isMcp ? `${pascalName}Input, ${pascalName}Output` : 'unknown, unknown'}>> = ({ tool, initialInput }) => {
-  const [inputVal, setInputVal] = useState<string>(${isMcp ? '(initialInput as any)?.input || "Hello World"' : '""'});
-  const [outputVal, setOutputVal] = useState<string>(${isMcp ? '"HELLO WORLD"' : '""'});
+export const ${pascalName}UI: React.FC<ToolComponentProps<${pascalName}Input, ${pascalName}Output>> = ({ tool, initialInput }) => {
+  const [inputVal, setInputVal] = useState<string>(initialInput?.input || 'Hello World');
+  const [outputVal, setOutputVal] = useState<string>('HELLO WORLD');
   const [execTime, setExecTime] = useState<number>(0);
 
   const handleRun = (text: string) => {
-    ${isMcp ? `const start = performance.now();
+    const start = performance.now();
     const res = execute${pascalName}({ input: text });
     const end = performance.now();
     setExecTime(end - start);
-    setOutputVal(res.result);` : '/* Interactive UI logic */'}
+    setOutputVal(res.result);
   };
 
   return (
@@ -220,7 +173,6 @@ export const ${pascalName}UI: React.FC<ToolComponentProps<${isMcp ? `${pascalNam
       tool={tool}
       executionTimeMs={execTime}
       inputData={{ input: inputVal }}
-      outputData={{ result: outputVal }}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <CodeEditor
@@ -262,10 +214,8 @@ export const ${pascalName}UI: React.FC<ToolComponentProps<${isMcp ? `${pascalNam
   console.log(`\n✅ Successfully scaffolded tool "${toolName}" in src/tools/${toolId}!`);
   console.log(`📁 Files created:`);
   console.log(`   - src/tools/${toolId}/definition.ts`);
-  if (isMcp) {
-    console.log(`   - src/tools/${toolId}/engine.ts`);
-    console.log(`   - src/tools/${toolId}/engine.test.ts`);
-  }
+  console.log(`   - src/tools/${toolId}/engine.ts`);
+  console.log(`   - src/tools/${toolId}/engine.test.ts`);
   console.log(`   - src/tools/${toolId}/ui.tsx`);
   console.log(`   - Registered in src/tools/index.ts\n`);
   console.log(`Run 'npm test' to verify your new tool's test suite!\n`);

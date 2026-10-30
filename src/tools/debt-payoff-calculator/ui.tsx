@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeDebtPayoff,
@@ -84,6 +85,7 @@ export const DebtPayoffUI: React.FC<ToolComponentProps<DebtPayoffInput, DebtPayo
           Adding a fixed extra amount (e.g. ₹2,000 or $50/mo) each month directly attacks the principal balance, causing payoff time to plummet dramatically.
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

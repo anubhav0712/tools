@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeAutoLoan,
@@ -87,6 +88,7 @@ export const AutoLoanUI: React.FC<ToolComponentProps<AutoLoanInput, AutoLoanOutp
             : 'In the US, state and local sales taxes (4-10%) plus title and dealer registration fees add thousands of dollars to MSRP. Rolling them into financing increases your loan balance.'}
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

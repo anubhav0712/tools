@@ -78,6 +78,7 @@ export function executeFd(input: FdInput): FdOutput {
   // Generate Year/Quarter schedule
   const schedule: FdScheduleItem[] = [];
   const scheduleSteps = Math.min(20, Math.ceil(totalYears));
+  let prevBalance = principal;
 
   for (let yr = 1; yr <= scheduleSteps; yr++) {
     const t = Math.min(yr, totalYears);
@@ -85,11 +86,13 @@ export function executeFd(input: FdInput): FdOutput {
       ? principal + principal * rateFraction * t
       : principal * Math.pow(1 + rateFraction / n, n * t);
     const intSoFar = bal - principal;
+    const periodInterest = bal - prevBalance;
+    prevBalance = bal;
 
     schedule.push({
       period: yr,
       label: `Year ${yr}${yr === scheduleSteps && totalYears % 1 !== 0 ? ' (Maturity)' : ''}`,
-      interestEarned: Math.round(intSoFar),
+      interestEarned: Math.round(periodInterest),
       cumulativeInterest: Math.round(intSoFar),
       balance: Math.round(bal),
     });

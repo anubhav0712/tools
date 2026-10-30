@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeInflation,
@@ -72,6 +73,7 @@ export const InflationUI: React.FC<ToolComponentProps<InflationInput, InflationO
           To build real wealth, your portfolio must generate returns higher than inflation plus taxes. Equity investments (index funds, broad market equities) have historically been one of the most reliable hedges against long-term inflation.
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

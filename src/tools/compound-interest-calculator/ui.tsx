@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeCompoundInterest,
@@ -90,6 +91,7 @@ export const CompoundInterestUI: React.FC<ToolComponentProps<CompoundInterestInp
           More frequent compounding (e.g. daily or monthly vs annually) means interest starts earning interest faster. Over long investment horizons (10-30 years), the compounding advantage produces massive exponential curves compared to simple linear interest.
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

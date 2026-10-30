@@ -7,6 +7,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import { Button } from '../../design-system/button';
 import { useRegion } from '../../core/locale-context';
 import { executeLoanCalculator } from './engine';
@@ -110,6 +111,7 @@ export const LoanCalculatorUI: React.FC<ToolComponentProps<LoanCalculatorInput, 
             : 'In the US, homeowners who itemize deductions can deduct mortgage interest on the first $750,000 of indebtedness under the Tax Cuts and Jobs Act.'}
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

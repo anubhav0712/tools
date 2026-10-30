@@ -56,6 +56,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     <dialog
       ref={dialogRef}
       onClose={onClose}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) {
+          onClose();
+        }
+      }}
       className="m-auto rounded-2xl bg-white border border-slate-200 text-slate-900 shadow-2xl p-0 w-full max-w-xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs focus:outline-none"
     >
       <div className="flex flex-col">

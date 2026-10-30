@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeEmergencyFund,
@@ -100,6 +101,7 @@ export const EmergencyFundUI: React.FC<ToolComponentProps<EmergencyFundInput, Em
             : 'Park your fund in a dedicated High-Yield Savings Account (HYSA) or Money Market Fund paying ~4-5% APY with instantaneous ACH transfers.'}
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

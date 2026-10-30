@@ -45,7 +45,8 @@ export const ToolShell: React.FC<ToolShellProps> = ({
     if (onBack) {
       onBack();
     } else {
-      window.location.hash = '';
+      window.history.pushState(null, '', window.location.pathname);
+      window.dispatchEvent(new PopStateEvent('popstate'));
       window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
   };
@@ -64,9 +65,8 @@ export const ToolShell: React.FC<ToolShellProps> = ({
     const url = generateShareableUrl();
     setShareUrl(url);
 
-    // Update browser URL without reload so user can also copy from address bar
-    window.history.replaceState(null, '', url);
-
+    // Note: Do not automatically rewrite or log URL into window history.
+    // The link is provided explicitly in the modal for the user to copy.
     try {
       await navigator.clipboard.writeText(url);
       setCopiedShare(true);
@@ -252,9 +252,14 @@ export const ToolShell: React.FC<ToolShellProps> = ({
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              All your custom numbers, inputs, and settings have been safely encoded into this URL. Anyone who opens it will load your exact calculation instantly.
-            </p>
+            <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-900 flex flex-col gap-1 leading-relaxed">
+              <span className="font-semibold text-amber-950">
+                Notice: Plain-Text Parameters
+              </span>
+              <p>
+                Inputs and calculation values in this link are serialized in plain text within the URL. Anyone with this link can view the numbers you entered. Do not share generated links if they contain sensitive or confidential financial data.
+              </p>
+            </div>
 
             <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
               <input

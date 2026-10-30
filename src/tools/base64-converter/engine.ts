@@ -46,7 +46,7 @@ export function executeBase64Converter(input: Base64ConverterInput): Base64Conve
       };
     } else {
       // Decode
-      let sanitized = text.trim();
+      let sanitized = text.replace(/\s+/g, '');
       if (urlSafe || sanitized.includes('-') || sanitized.includes('_')) {
         sanitized = sanitized.replace(/-/g, '+').replace(/_/g, '/');
         while (sanitized.length % 4 !== 0) {

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeFd,
@@ -89,6 +90,7 @@ export const FdUI: React.FC<ToolComponentProps<FdInput, FdOutput>> = ({
             : 'In the US, 1099-INT interest income is taxed as ordinary income at your marginal federal and state tax rates.'}
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 
@@ -320,7 +322,8 @@ export const FdUI: React.FC<ToolComponentProps<FdInput, FdOutput>> = ({
                     <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                       <tr>
                         <th className="py-2.5 px-3">Timeline</th>
-                        <th className="py-2.5 px-3">Interest Accrued</th>
+                        <th className="py-2.5 px-3">Year's Interest</th>
+                        <th className="py-2.5 px-3">Total Cumulative</th>
                         <th className="py-2.5 px-3 text-right">Account Balance</th>
                       </tr>
                     </thead>
@@ -328,7 +331,8 @@ export const FdUI: React.FC<ToolComponentProps<FdInput, FdOutput>> = ({
                       {result.schedule.map((row) => (
                         <tr key={row.period} className="hover:bg-slate-50/80">
                           <td className="py-2 px-3 font-sans font-medium text-slate-800">{row.label}</td>
-                          <td className="py-2 px-3 text-emerald-600 font-medium">+{formatCurrency(row.cumulativeInterest)}</td>
+                          <td className="py-2 px-3 text-emerald-600 font-medium">+{formatCurrency(row.interestEarned)}</td>
+                          <td className="py-2 px-3 text-slate-600">+{formatCurrency(row.cumulativeInterest)}</td>
                           <td className="py-2 px-3 text-right font-bold text-slate-900">{formatCurrency(row.balance)}</td>
                         </tr>
                       ))}

@@ -144,8 +144,16 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
           {filteredTools.map((tool) => (
             <div
               key={tool.metadata.id}
+              role="button"
+              tabIndex={0}
               onClick={() => onSelectTool(tool.metadata.id)}
-              className="group flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer shadow-xs"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectTool(tool.metadata.id);
+                }
+              }}
+              className="group flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">

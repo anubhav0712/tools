@@ -22,10 +22,10 @@ interface RegionContextType {
 const RegionContext = createContext<RegionContextType | undefined>(undefined);
 
 export const RegionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [region, setRegionState] = useState<RegionCode>('US');
+  const [region, setRegionState] = useState<RegionCode>(() => detectUserRegion());
 
   useEffect(() => {
-    // Initial client-side detection
+    // Sync client-side detection on mount if needed
     const detected = detectUserRegion();
     setRegionState(detected);
   }, []);

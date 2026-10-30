@@ -130,26 +130,15 @@ export const JsonFormatterUI: React.FC<ToolComponentProps<JsonFormatterInput, Js
             </div>
           )}
 
-          <label className="cursor-pointer">
+          <label className="inline-flex items-center gap-1.5 text-xs h-7 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium transition-colors cursor-pointer shadow-2xs">
             <input
               type="file"
               accept=".json,application/json"
               onChange={handleFileUpload}
               className="hidden"
             />
-            <Button
-              variant="secondary"
-              size="sm"
-              type="button"
-              className="text-xs h-7 px-2.5 gap-1.5"
-              onClick={(e) => {
-                const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                input?.click();
-              }}
-            >
-              <FileUp className="w-3.5 h-3.5 text-slate-500" />
-              <span>Load File</span>
-            </Button>
+            <FileUp className="w-3.5 h-3.5 text-slate-500" />
+            <span>Load File</span>
           </label>
         </div>
       </div>

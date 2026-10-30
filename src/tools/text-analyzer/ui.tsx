@@ -66,7 +66,7 @@ export const TextAnalyzerUI: React.FC<ToolComponentProps<TextAnalyzerInput, Text
   const toLowercase = () => setText((prev) => prev.toLowerCase());
   const toTitleCase = () =>
     setText((prev) =>
-      prev.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase())
+      prev.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     );
   const cleanExtraSpaces = () =>
     setText((prev) => prev.replace(/[ \t]+/g, ' ').replace(/\n\s*\n/g, '\n\n').trim());
@@ -176,26 +176,15 @@ export const TextAnalyzerUI: React.FC<ToolComponentProps<TextAnalyzerInput, Text
           </div>
 
           <div className="flex items-center gap-1.5">
-            <label className="cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 text-xs h-7 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium transition-colors cursor-pointer shadow-2xs">
               <input
                 type="file"
                 accept=".txt,.md,.text"
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="text-xs h-7 px-2 text-slate-600 gap-1"
-                onClick={(e) => {
-                  const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                  input?.click();
-                }}
-              >
-                <FileUp className="w-3.5 h-3.5" />
-                <span>Upload</span>
-              </Button>
+              <FileUp className="w-3.5 h-3.5 text-slate-500" />
+              <span>Upload</span>
             </label>
 
             {text && (

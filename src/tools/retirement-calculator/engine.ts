@@ -101,19 +101,24 @@ export function executeRetirementPlanner(input: RetirementInput): RetirementOutp
   const fireNumber25x = Math.round(annualExpenseAtRetirement * 25);
   const fireNumber33x = Math.round(annualExpenseAtRetirement * 33.33);
 
-  // 7. Timeline trajectory
+  // 7. Timeline trajectory with exact monthly compounding matching projectedCorpus
   const timeline: RetirementYearMilestone[] = [];
-  let corpusTracker = currentSavings;
 
   for (let yr = 1; yr <= yearsToRetire; yr++) {
-    const age = currentAge + yr;
-    corpusTracker = corpusTracker * (1 + preReturnRate) + monthlyContribution * 12;
     if (yr % 5 === 0 || yr === yearsToRetire) {
+      const age = currentAge + yr;
+      const monthsElapsed = yr * 12;
+      const yrSavingsFV = currentSavings * Math.pow(1 + preReturnRate, yr);
+      const yrContribFV = monthlyPreRate > 0
+        ? monthlyContribution * ((Math.pow(1 + monthlyPreRate, monthsElapsed) - 1) / monthlyPreRate)
+        : monthlyContribution * monthsElapsed;
+      const milestoneCorpus = Math.round(yrSavingsFV + yrContribFV);
+
       timeline.push({
         age,
         year: yr,
         annualExpense: Math.round(currentMonthlyExpense * 12 * Math.pow(1 + inflationRate, yr)),
-        projectedCorpus: Math.round(corpusTracker),
+        projectedCorpus: milestoneCorpus,
         phase: 'accumulation',
       });
     }

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { useSharedProfile } from '../../core/shared-profile-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeSalaryTax,
@@ -212,6 +213,8 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
           </div>
         </div>
       )}
+
+      <FinancialDisclaimer />
     </div>
   );
 

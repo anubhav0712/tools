@@ -8,6 +8,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import { Button } from '../../design-system/button';
 import { useRegion } from '../../core/locale-context';
 import { executeSipCalculator } from './engine';
@@ -94,6 +95,7 @@ export const SipCalculatorUI: React.FC<ToolComponentProps<SipCalculatorInput, Si
             : 'In the US, investments held in taxable brokerage accounts for over 1 year qualify for preferential Long-Term Capital Gains rates (0%, 15%, or 20% depending on income). Investments in 401(k) / IRA accounts grow tax-deferred or tax-free.'}
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

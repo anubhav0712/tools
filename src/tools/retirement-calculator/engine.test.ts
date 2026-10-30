@@ -21,6 +21,9 @@ describe('Retirement & FIRE Planner Engine', () => {
     expect(res.requiredCorpus).toBeGreaterThan(10000000); // More than 1 Crore
     expect(res.projectedCorpus).toBeGreaterThan(0);
     expect(res.timeline.length).toBeGreaterThan(0);
+    // Ensure final timeline milestone exactly matches projectedCorpus without compounding discrepancy
+    const finalMilestone = res.timeline[res.timeline.length - 1];
+    expect(finalMilestone.projectedCorpus).toBe(res.projectedCorpus);
   });
 
   it('determines if user is retirement ready and handles shortfall', () => {

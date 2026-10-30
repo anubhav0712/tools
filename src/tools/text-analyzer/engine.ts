@@ -23,8 +23,9 @@ export function executeTextAnalyzer(input: TextAnalyzerInput): TextAnalyzerOutpu
   const characters = text.length;
   const charactersNoSpaces = text.replace(/\s/g, '').length;
 
-  // Sentences: split by punctuation followed by space or end of string
-  const sentences = (trimmed.match(/[^.!?]+[.!?]+(\s|$)/g) || [trimmed]).length;
+  // Sentences: match sequences of characters terminated by punctuation OR end of string
+  const sentences = (trimmed.match(/[^.!?]+([.!?]+(\s|$)|$)/g) || [])
+    .filter((s) => s.trim().length > 0).length;
 
   // Paragraphs: split by double newlines or single non-empty lines
   const paragraphs = trimmed

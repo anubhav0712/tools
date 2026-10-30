@@ -16,7 +16,8 @@ function sortObjectKeys(obj: unknown): unknown {
 }
 
 export function executeJsonFormatter(input: JsonFormatterInput): JsonFormatterOutput {
-  const { rawJson, indent = 2, sortKeys = false } = input;
+  const { indent = 2, sortKeys = false } = input || {};
+  const rawJson = input?.rawJson ?? '';
 
   if (!rawJson.trim()) {
     return {

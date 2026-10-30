@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
 import { ToolShell } from '../../design-system/tool-shell';
+import { FinancialDisclaimer } from '../../design-system/financial-disclaimer';
 import type { ToolComponentProps } from '../../core/types';
 import {
   executeRetirementPlanner,
@@ -107,6 +108,7 @@ export const RetirementUI: React.FC<ToolComponentProps<RetirementInput, Retireme
           - <strong>Conservative 3% to 3.3% (30x-33x Corpus):</strong> Strongly recommended for Early FIRE retirees (retiring in 30s or 40s with a 40+ year horizon).
         </p>
       </div>
+      <FinancialDisclaimer />
     </div>
   );
 

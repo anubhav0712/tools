@@ -6,27 +6,32 @@ export interface ParsedUrlState {
 export function parseUrlState(): ParsedUrlState {
   if (typeof window === 'undefined') return {};
 
-  const hash = window.location.hash.replace(/^#\/?/, '');
-  if (!hash) return {};
+  try {
+    const hash = window.location.hash.replace(/^#\/?/, '');
+    if (!hash) return {};
 
-  const params = new URLSearchParams(hash);
-  const toolId = params.get('tool') || undefined;
-  const rawInput = params.get('input');
+    const params = new URLSearchParams(hash);
+    const toolId = params.get('tool') || undefined;
+    const rawInput = params.get('input');
 
-  let initialInput: unknown = undefined;
-  if (rawInput) {
-    try {
-      initialInput = JSON.parse(decodeURIComponent(rawInput));
-    } catch {
+    let initialInput: unknown = undefined;
+    if (rawInput) {
       try {
-        initialInput = JSON.parse(rawInput);
+        initialInput = JSON.parse(decodeURIComponent(rawInput));
       } catch {
-        initialInput = rawInput;
+        try {
+          initialInput = JSON.parse(rawInput);
+        } catch {
+          initialInput = rawInput;
+        }
       }
     }
-  }
 
-  return { toolId, initialInput };
+    return { toolId, initialInput };
+  } catch (err) {
+    console.error('Failed to parse URL state hash:', err);
+    return {};
+  }
 }
 
 export function setUrlTool(toolId: string | null, input?: unknown): void {

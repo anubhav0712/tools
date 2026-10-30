@@ -16,6 +16,14 @@ describe('Fixed Deposit & CD Calculator Engine', () => {
     expect(res.maturityAmount).toBe(123144);
     expect(res.totalInterestEarned).toBe(23144);
     expect(res.absoluteReturnPercent).toBeCloseTo(23.14, 1);
+
+    // Verify schedule reports incremental period interest distinct from cumulative interest
+    expect(res.schedule).toHaveLength(3);
+    const yr1 = res.schedule[0];
+    const yr2 = res.schedule[1];
+    expect(yr1.interestEarned).toBe(yr1.cumulativeInterest);
+    expect(yr2.interestEarned).not.toBe(yr2.cumulativeInterest);
+    expect(yr2.interestEarned + yr1.interestEarned).toBe(yr2.cumulativeInterest);
   });
 
   it('adds senior citizen bonus rate properly', () => {

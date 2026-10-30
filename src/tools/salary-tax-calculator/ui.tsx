@@ -26,7 +26,7 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
   initialInput,
 }) => {
   const { region, config, formatCurrency } = useRegion();
-  const { profile, updateProfile } = useSharedProfile();
+  const { profile } = useSharedProfile();
 
   const defaultSalary = initialInput?.annualGrossSalary ?? (profile.annualGrossIncome || (region === 'IN' ? 1200000 : 85000));
 
@@ -116,16 +116,6 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
   const takeHomePercent = result.annualGross > 0
     ? Math.round((result.annualTakeHome / result.annualGross) * 100)
     : 100;
-
-  // Sync to shared profile if desired
-  const handleSyncToSharedProfile = () => {
-    updateProfile({
-      annualGrossIncome: grossSalary,
-      indiaTaxRegime: indiaRegime,
-      usFilingStatus: filingStatus,
-      usStateTaxRate: stateTaxRate,
-    });
-  };
 
   // ---------------- DOCUMENTATION CONTENT ----------------
   const documentationNode = (
@@ -399,17 +389,9 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
               onChange={(e) => setGrossSalary(Number(e.target.value))}
               className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-100 rounded-lg"
             />
-            <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
-              <span>{formatCurrency(Math.round(grossSalary / 12))}/month gross</span>
-              <button
-                type="button"
-                onClick={handleSyncToSharedProfile}
-                className="text-indigo-600 hover:underline cursor-pointer font-sans font-medium"
-                title="Save as default across all tools"
-              >
-                Save to Shared Profile
-              </button>
-            </div>
+            <span className="text-[11px] text-slate-500 font-mono">
+              Equivalent to {formatCurrency(Math.round(grossSalary / 12))}/month gross
+            </span>
           </div>
 
           {/* Region Specific Controls */}

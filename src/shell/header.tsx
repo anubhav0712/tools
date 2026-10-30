@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Wrench, Search, Github, ChevronDown, Check, Sliders } from 'lucide-react';
+import { Wrench, Search, Github, ChevronDown, Check } from 'lucide-react';
 import { useRegion } from '../core/locale-context';
 import { REGIONS, RegionCode } from '../core/locale';
-import { SharedProfileModal } from './shared-profile-modal';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
@@ -17,7 +16,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { region, setRegion } = useRegion();
   const [isRegionOpen, setIsRegionOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -46,16 +44,9 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
               <Wrench className="w-4 h-4 text-white" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-base tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
-                  Tools
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold border border-slate-200">
-                  100% Private
-                </span>
-              </div>
-            </div>
+            <span className="font-bold text-base tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+              Tools
+            </span>
           </button>
 
           {currentToolName && (
@@ -133,17 +124,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Shared Profile Button */}
-          <button
-            type="button"
-            onClick={() => setIsProfileOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition cursor-pointer shadow-2xs"
-            title="Shared Financial Assumptions & Profile"
-          >
-            <Sliders className="w-3.5 h-3.5 text-indigo-600" />
-            <span className="hidden sm:inline">Profile</span>
-          </button>
-
           <button
             type="button"
             onClick={onOpenSearch}
@@ -164,11 +144,6 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
         </div>
       </div>
-
-      <SharedProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-      />
     </header>
   );
 };

@@ -14,6 +14,7 @@ import {
   Calendar,
   ShieldCheck,
   Table as TableIcon,
+  BookOpen,
 } from 'lucide-react';
 
 export const FdUI: React.FC<ToolComponentProps<FdInput, FdOutput>> = ({
@@ -62,8 +63,42 @@ export const FdUI: React.FC<ToolComponentProps<FdInput, FdOutput>> = ({
     setShowSchedule(false);
   };
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Fixed Deposit & Certificate of Deposit (CD) Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. Compounding Standards</h4>
+        <p className="text-xs text-slate-600">
+          In India, banks compound Fixed Deposit interest <strong>quarterly (every 3 months)</strong>. In the US, Certificates of Deposit (CD) and High-Yield Savings Accounts usually compound <strong>monthly or daily</strong>.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
+        <h4 className="font-bold text-indigo-950">2. Senior Citizen Privileges</h4>
+        <p className="text-xs text-indigo-900">
+          Almost all commercial banks offer an extra <strong>+0.50% p.a. interest rate premium</strong> for senior citizens (age 60+). Over a 3 to 5-year tenure, this bonus can increase total interest earned by 7% to 10%.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Tax Deducted at Source (TDS) Rules</h4>
+        <p className="text-xs text-slate-600">
+          {region === 'IN'
+            ? 'In India, 10% TDS is deducted if interest earned across all your FDs with a bank exceeds ₹40,000 in a year (₹50,000 for senior citizens). If your total income is below the taxable limit, you can submit Form 15G (below age 60) or Form 15H (senior citizens) to prevent TDS deduction.'
+            : 'In the US, 1099-INT interest income is taxed as ordinary income at your marginal federal and state tax rates.'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

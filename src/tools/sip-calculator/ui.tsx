@@ -5,6 +5,7 @@ import {
   ChevronUp,
   Sparkles,
   TrendingUp,
+  BookOpen,
 } from 'lucide-react';
 import { ToolShell } from '../../design-system/tool-shell';
 import { Button } from '../../design-system/button';
@@ -67,6 +68,35 @@ export const SipCalculatorUI: React.FC<ToolComponentProps<SipCalculatorInput, Si
   const maxMonthly = region === 'IN' ? 100000 : 5000;
   const monthlyStep = region === 'IN' ? 500 : 50;
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Systematic Investment Plan (SIP / DCA) Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. How SIP & Dollar-Cost Averaging Works</h4>
+        <p className="text-xs text-slate-600">
+          A Systematic Investment Plan (SIP) enables you to invest a fixed amount regularly into mutual funds or index ETFs. By investing consistently across market ups and downs, you practice Dollar/Rupee Cost Averaging — purchasing more units when prices are low and fewer units when prices are high.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex flex-col gap-2">
+        <h4 className="font-bold text-emerald-950">2. The 10% Annual Step-Up Miracle</h4>
+        <p className="text-xs text-emerald-900">
+          As your salary increases each year, increasing your monthly SIP by just 10% annually can produce more than <strong>double the final wealth</strong> compared to a flat monthly investment over a 15-year horizon!
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Capital Gains Tax Considerations</h4>
+        <p className="text-xs text-slate-600">
+          {region === 'IN'
+            ? 'In India (FY 2024-25 onwards), Long-Term Capital Gains (LTCG) on equity mutual funds held for over 1 year are taxed at 12.5% on profits exceeding ₹1.25 Lakhs per financial year. STCG is taxed at 20%.'
+            : 'In the US, investments held in taxable brokerage accounts for over 1 year qualify for preferential Long-Term Capital Gains rates (0%, 15%, or 20% depending on income). Investments in 401(k) / IRA accounts grow tax-deferred or tax-free.'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <ToolShell
       tool={tool}
@@ -78,6 +108,7 @@ export const SipCalculatorUI: React.FC<ToolComponentProps<SipCalculatorInput, Si
       }}
       executionTimeMs={executionTime}
       inputData={{ monthlyInvestment: monthly, annualExpectedReturn: expectedReturn, investmentYears: years }}
+      documentation={documentationNode}
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Sliders & Controls (7 cols) */}

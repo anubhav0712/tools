@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Wrench, ShieldCheck, Search, Github, ChevronDown, Check } from 'lucide-react';
+import { Wrench, Search, Github, ChevronDown, Check, Sliders } from 'lucide-react';
 import { useRegion } from '../core/locale-context';
 import { REGIONS, RegionCode } from '../core/locale';
+import { SharedProfileModal } from './shared-profile-modal';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { region, setRegion } = useRegion();
   const [isRegionOpen, setIsRegionOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -131,6 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
+          {/* Shared Profile Button */}
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition cursor-pointer shadow-2xs"
+            title="Shared Financial Assumptions & Profile"
+          >
+            <Sliders className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="hidden sm:inline">Profile</span>
+          </button>
+
           <button
             type="button"
             onClick={onOpenSearch}
@@ -139,11 +152,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Search className="w-4 h-4" />
           </button>
-
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-medium text-emerald-700">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Zero Cloud</span>
-          </div>
 
           <a
             href="https://github.com/anubhav0712/tools"
@@ -156,6 +164,11 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
         </div>
       </div>
+
+      <SharedProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
     </header>
   );
 };

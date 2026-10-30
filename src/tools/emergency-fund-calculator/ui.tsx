@@ -15,6 +15,7 @@ import {
   HeartPulse,
   MoreHorizontal,
   PiggyBank,
+  BookOpen,
 } from 'lucide-react';
 
 export const EmergencyFundUI: React.FC<ToolComponentProps<EmergencyFundInput, EmergencyFundOutput>> = ({
@@ -71,8 +72,44 @@ export const EmergencyFundUI: React.FC<ToolComponentProps<EmergencyFundInput, Em
     setContrib(defaultContrib);
   };
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Emergency Safety Net Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. What is an Emergency Fund?</h4>
+        <p className="text-xs text-slate-600">
+          An emergency fund is a ring-fenced reserve of highly liquid cash meant exclusively for unforeseen events: medical emergencies, job loss, sudden major home/car repairs. It is insurance against life, not an investment intended for high yields.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
+        <h4 className="font-bold text-indigo-950">2. How Many Months of Expenses Do You Need?</h4>
+        <ul className="list-disc list-inside text-xs text-indigo-900 space-y-1">
+          <li><strong>3 Months:</strong> Dual-income couples with stable corporate or government jobs and zero dependents.</li>
+          <li><strong>6 Months (Recommended):</strong> Standard baseline for most single-earner households and families with kids.</li>
+          <li><strong>9 to 12 Months:</strong> Freelancers, commission-based sales roles, contract workers, and startup founders.</li>
+        </ul>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Where to Keep Your Emergency Fund</h4>
+        <p className="text-xs text-slate-600">
+          {region === 'IN'
+            ? 'Never lock emergency funds in illiquid assets or volatile equities. Keep 1-2 months in a savings bank account with sweep-in FD facility, and 4-5 months in an instant-redemption Liquid Mutual Fund.'
+            : 'Park your fund in a dedicated High-Yield Savings Account (HYSA) or Money Market Fund paying ~4-5% APY with instantaneous ACH transfers.'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

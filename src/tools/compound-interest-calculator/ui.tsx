@@ -17,6 +17,7 @@ import {
   Percent,
   PlusCircle,
   Table as TableIcon,
+  BookOpen,
 } from 'lucide-react';
 
 export const CompoundInterestUI: React.FC<ToolComponentProps<CompoundInterestInput, CompoundInterestOutput>> = ({
@@ -67,8 +68,38 @@ export const CompoundInterestUI: React.FC<ToolComponentProps<CompoundInterestInp
     : 0;
   const interestPercent = Math.max(0, 100 - depositPercent);
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Compound Interest Explained
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. The Compound Formula</h4>
+        <p className="text-xs text-slate-600">
+          Compound interest is interest calculated on the initial principal and also on the accumulated interest of previous periods:
+          <code className="p-1 rounded bg-slate-100 font-mono text-slate-900 font-bold block my-1">
+            A = P × (1 + r/n)^(n×t)
+          </code>
+          where <strong>P</strong> is Principal, <strong>r</strong> is Annual Interest Rate, <strong>n</strong> is Compounding Frequency per year, and <strong>t</strong> is Years.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
+        <h4 className="font-bold text-indigo-950">2. Frequency Matters</h4>
+        <p className="text-xs text-indigo-900">
+          More frequent compounding (e.g. daily or monthly vs annually) means interest starts earning interest faster. Over long investment horizons (10-30 years), the compounding advantage produces massive exponential curves compared to simple linear interest.
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

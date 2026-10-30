@@ -13,6 +13,7 @@ import {
   DollarSign,
   AlertTriangle,
   Table as TableIcon,
+  BookOpen,
 } from 'lucide-react';
 
 export const InflationUI: React.FC<ToolComponentProps<InflationInput, InflationOutput>> = ({
@@ -47,8 +48,40 @@ export const InflationUI: React.FC<ToolComponentProps<InflationInput, InflationO
     setShowSchedule(false);
   };
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Inflation & Purchasing Power Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. How Inflation Destroys Cash</h4>
+        <p className="text-xs text-slate-600">
+          Inflation represents the rate at which the price of goods and services rises, eroding the buying power of currency. Even low inflation rates compounded over 10 to 20 years cut the real purchasing power of cash savings in half.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col gap-2">
+        <h4 className="font-bold text-amber-950">2. The Rule of 72</h4>
+        <p className="text-xs text-amber-900">
+          The Rule of 72 is an easy mental shortcut: divide 72 by the annual inflation rate to find out how many years it takes for prices to double. At 6% inflation (typical in India), prices double every <strong>12 years</strong>. At 3% inflation (US target), prices double every <strong>24 years</strong>.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Beating Inflation</h4>
+        <p className="text-xs text-slate-600">
+          To build real wealth, your portfolio must generate returns higher than inflation plus taxes. Equity investments (index funds, broad market equities) have historically been one of the most reliable hedges against long-term inflation.
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

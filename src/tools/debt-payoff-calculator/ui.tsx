@@ -15,6 +15,7 @@ import {
   Calendar,
   CheckCircle2,
   Table as TableIcon,
+  BookOpen,
 } from 'lucide-react';
 
 export const DebtPayoffUI: React.FC<ToolComponentProps<DebtPayoffInput, DebtPayoffOutput>> = ({
@@ -59,8 +60,40 @@ export const DebtPayoffUI: React.FC<ToolComponentProps<DebtPayoffInput, DebtPayo
   const yearsPart = Math.floor(result.monthsToPayoff / 12);
   const monthsPart = result.monthsToPayoff % 12;
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Credit Card Payoff & Debt Snowball Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. The Minimum Payment Trap</h4>
+        <p className="text-xs text-slate-600">
+          Credit card companies set minimum monthly payments at approximately 2% to 3% of the outstanding balance. If you pay only the minimum, interest compounds daily, keeping you in debt for 15 to 30 years and costing 3x to 5x your original balance in pure interest.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 flex flex-col gap-2">
+        <h4 className="font-bold text-rose-950">2. High APR Awareness</h4>
+        <p className="text-xs text-rose-900">
+          With credit card APRs hovering between <strong>20% to 42% per year</strong>, credit card debt is the single most expensive consumer debt. Eliminating card debt provides a guaranteed risk-free return equal to your card's APR.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. The Snowball Method</h4>
+        <p className="text-xs text-slate-600">
+          Adding a fixed extra amount (e.g. ₹2,000 or $50/mo) each month directly attacks the principal balance, causing payoff time to plummet dramatically.
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

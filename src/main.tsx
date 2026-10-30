@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { RegionProvider } from './core/locale-context';
+import { SharedProfileProvider } from './core/shared-profile-context';
 import './design-system/theme.css';
 
 const container = document.getElementById('root');
@@ -10,7 +11,9 @@ if (container) {
   root.render(
     <React.StrictMode>
       <RegionProvider>
-        <App />
+        <SharedProfileProvider>
+          <App />
+        </SharedProfileProvider>
       </RegionProvider>
     </React.StrictMode>
   );

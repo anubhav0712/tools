@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import { ToolShell } from '../../design-system/tool-shell';
 import { Button } from '../../design-system/button';
@@ -79,6 +80,39 @@ export const LoanCalculatorUI: React.FC<ToolComponentProps<LoanCalculatorInput, 
   const maxPrincipal = region === 'IN' ? 20000000 : 1500000;
   const principalStep = region === 'IN' ? 50000 : 5000;
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Loan & Mortgage EMI Complete Guide ({region === 'IN' ? 'India' : 'US'})
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. How EMI is Calculated</h4>
+        <p className="text-xs text-slate-600">
+          Equated Monthly Installment (EMI) is computed using the reducing balance method:
+          <code className="p-1 rounded bg-slate-100 font-mono text-slate-900 font-bold block my-1">
+            EMI = [P × r × (1 + r)^n] / [(1 + r)^n - 1]
+          </code>
+          where <strong>P</strong> is Loan Principal, <strong>r</strong> is Monthly Interest Rate (Annual Rate / 12 / 100), and <strong>n</strong> is Total Number of Months.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex flex-col gap-2">
+        <h4 className="font-bold text-indigo-950">2. The Prepayment Advantage</h4>
+        <p className="text-xs text-indigo-900">
+          In early loan years, up to 70-80% of your EMI goes toward paying interest, not the principal. Making even a small extra monthly payment (e.g. ₹5,000 or $100/mo) reduces the principal balance directly, creating exponential interest savings and shortening your tenure by multiple years.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Tax Deductions on Home Loans</h4>
+        <p className="text-xs text-slate-600">
+          {region === 'IN'
+            ? 'In India (Old Tax Regime), Section 24(b) allows up to ₹2,00,000 deduction on home loan interest for self-occupied properties, and Section 80C allows up to ₹1,50,000 deduction on principal repayment.'
+            : 'In the US, homeowners who itemize deductions can deduct mortgage interest on the first $750,000 of indebtedness under the Tax Cuts and Jobs Act.'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <ToolShell
       tool={tool}
@@ -92,6 +126,7 @@ export const LoanCalculatorUI: React.FC<ToolComponentProps<LoanCalculatorInput, 
       }}
       executionTimeMs={executionTime}
       inputData={{ principal, annualInterestRate: rate, tenureYears, extraMonthlyPayment: extraMonthly }}
+      documentation={documentationNode}
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Interactive Inputs & Sliders (7 cols) */}

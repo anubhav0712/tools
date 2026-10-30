@@ -39,6 +39,23 @@ describe('Salary & Take-Home Tax Calculator Engine', () => {
       expect(res.breakdown.additionalTaxOrCess).toBe(5000);
       expect(res.totalTaxAnnual).toBe(130000);
     });
+
+    it('respects advanced overrides like custom standard deduction and cess rate', () => {
+      const res = executeSalaryTax({
+        region: 'IN',
+        annualGrossSalary: 1500000,
+        indiaRegime: 'new',
+        customStandardDeduction: 100000, // Custom 1L standard deduction
+        customCessRatePercent: 0,        // 0% cess
+        includeEpf: false,
+      });
+
+      // 15L - 1L = 14L taxable.
+      // Slabs: 0-3L 0, 3-7L 20k, 7-10L 30k, 10-12L 30k, 12-14L 40k = 120,000 base tax
+      expect(res.breakdown.incomeTax).toBe(120000);
+      expect(res.breakdown.additionalTaxOrCess).toBe(0);
+      expect(res.totalTaxAnnual).toBe(120000);
+    });
   });
 
   describe('US Federal & FICA Tax', () => {

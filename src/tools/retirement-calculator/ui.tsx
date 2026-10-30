@@ -11,6 +11,7 @@ import {
   Flame,
   AlertTriangle,
   Table as TableIcon,
+  BookOpen,
 } from 'lucide-react';
 
 export const RetirementUI: React.FC<ToolComponentProps<RetirementInput, RetirementOutput>> = ({
@@ -81,8 +82,41 @@ export const RetirementUI: React.FC<ToolComponentProps<RetirementInput, Retireme
     ? Math.min(150, Math.round((result.projectedCorpus / result.requiredCorpus) * 100))
     : 100;
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Retirement & FIRE Planning Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. The FIRE Movement & The 4% Rule</h4>
+        <p className="text-xs text-slate-600">
+          FIRE stands for <strong>Financial Independence, Retire Early</strong>. The core benchmark is the famous Trinity Study 4% Rule, which states that if you accumulate <strong>25 times your annual living expenses</strong> (in a balanced portfolio of equities and bonds), you can safely withdraw 4% each year (adjusted for inflation) with virtually zero risk of running out of money over a 30-year retirement.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col gap-2">
+        <h4 className="font-bold text-amber-950">2. Why Inflation is the #1 Retirement Enemy</h4>
+        <p className="text-xs text-amber-900">
+          If your family lives on {formatCurrency(expense)}/month today, a modest {inflation}% inflation rate will expand that identical basket of expenses to <strong>{formatCurrency(result.monthlyExpenseAtRetirement)}/month</strong> in {result.yearsToRetirement} years. This is why retirement planning must always account for post-retirement inflation rather than current living costs.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Safe Withdrawal Rate (SWR) Recommendations</h4>
+        <p className="text-xs text-slate-600">
+          - <strong>Standard 4% (25x Corpus):</strong> Ideal for traditional retirements (retiring in late 50s or 60s for a 25-30 year horizon).<br />
+          - <strong>Conservative 3% to 3.3% (30x-33x Corpus):</strong> Strongly recommended for Early FIRE retirees (retiring in 30s or 40s with a 40+ year horizon).
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

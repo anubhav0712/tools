@@ -18,7 +18,11 @@ export function parseUrlState(): ParsedUrlState {
     try {
       initialInput = JSON.parse(decodeURIComponent(rawInput));
     } catch {
-      initialInput = rawInput;
+      try {
+        initialInput = JSON.parse(rawInput);
+      } catch {
+        initialInput = rawInput;
+      }
     }
   }
 

@@ -16,6 +16,16 @@ export interface SalaryTaxInput {
   usFilingStatus?: UsFilingStatus;
   usStateTaxRate?: number;     // e.g. 4.5% average or 0% for TX/FL
   usPreTaxDeductions?: number; // 401(k) / HSA / FSA
+
+  // Advanced Overrides
+  customStandardDeduction?: number;
+  customCessRatePercent?: number;          // Default 4%
+  customSection87aCeiling?: number;        // Default 700000 in new regime
+  customEpfAnnual?: number;
+  customProfessionalTaxAnnual?: number;    // Default 2400 in India
+  customSocialSecurityCap?: number;        // Default $168,600
+  customSocialSecurityRatePercent?: number;// Default 6.2%
+  customMedicareRatePercent?: number;      // Default 1.45%
 }
 
 export interface TaxBracketBreakdown {
@@ -41,7 +51,7 @@ export interface SalaryTaxOutput {
 
   breakdown: {
     incomeTax: number;
-    additionalTaxOrCess: number; // India: 4% cess; US: FICA (SS + Medicare) + State
+    additionalTaxOrCess: number; // India: cess; US: FICA + State
     retirementOrPf: number;      // EPF or 401k
     standardDeduction: number;
     taxableIncome: number;
@@ -55,9 +65,12 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
   const gross = Math.max(0, input.annualGrossSalary || 0);
   const regime = input.indiaRegime || 'new';
 
-  let standardDeduction = regime === 'new' ? 75000 : 50000;
-  let otherDeductions = 0;
+  const defaultStdDeduction = regime === 'new' ? 75000 : 50000;
+  const standardDeduction = input.customStandardDeduction !== undefined
+    ? Math.max(0, input.customStandardDeduction)
+    : defaultStdDeduction;
 
+  let otherDeductions = 0;
   if (regime === 'old') {
     const d80c = Math.min(150000, Math.max(0, input.indiaDeductions80C || 0));
     const d80d = Math.min(50000, Math.max(0, input.indiaDeductions80D || 0));
@@ -98,8 +111,12 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
       }
     }
 
-    // Rebate u/s 87A: If taxable income <= 7,00,000, tax is zero
-    if (taxableIncome <= 700000) {
+    // Rebate u/s 87A: If taxable income <= ceiling, tax is zero
+    const rebateCeiling = input.customSection87aCeiling !== undefined
+      ? input.customSection87aCeiling
+      : 700000;
+
+    if (taxableIncome <= rebateCeiling) {
       baseTax = 0;
     }
   } else {
@@ -128,20 +145,28 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
       }
     }
 
-    // Rebate u/s 87A for Old Regime: if taxable income <= 5,00,000, tax is zero
-    if (taxableIncome <= 500000) {
+    const rebateCeiling = input.customSection87aCeiling !== undefined
+      ? input.customSection87aCeiling
+      : 500000;
+
+    if (taxableIncome <= rebateCeiling) {
       baseTax = 0;
     }
   }
 
-  // 4% Health & Education Cess
-  const cess = baseTax > 0 ? baseTax * 0.04 : 0;
+  // Health & Education Cess (default 4%)
+  const cessPercent = (input.customCessRatePercent !== undefined ? input.customCessRatePercent : 4.0) / 100;
+  const cess = baseTax > 0 ? baseTax * cessPercent : 0;
   const totalTax = baseTax + cess;
 
-  // EPF: Employee contribution ~ 12% of basic (assuming basic is ~40-50% of CTC, capped or 1800/mo min)
-  const monthlyEpf = input.includeEpf !== false ? Math.min(gross * 0.05, 21600) : 0;
-  const annualEpf = monthlyEpf;
-  const professionalTax = 2400; // Standard ₹200/mo
+  // EPF & Professional Tax
+  const annualEpf = input.customEpfAnnual !== undefined
+    ? input.customEpfAnnual
+    : (input.includeEpf !== false ? Math.min(gross * 0.05, 21600) : 0);
+
+  const professionalTax = input.customProfessionalTaxAnnual !== undefined
+    ? input.customProfessionalTaxAnnual
+    : 2400;
 
   const totalDeductionsAnnual = Math.round(totalTax + annualEpf + professionalTax);
   const annualTakeHome = Math.max(0, Math.round(gross - totalDeductionsAnnual));
@@ -179,11 +204,14 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
   const preTaxDeductions = Math.max(0, input.usPreTaxDeductions || 0); // 401(k)
   const stateRate = Math.max(0, input.usStateTaxRate ?? 4.5) / 100;
 
-  // Standard deduction 2024
-  const standardDeduction = status === 'married' ? 29200 : 14600;
+  // Standard deduction 2024 (Single $14,600, Married $29,200)
+  const defaultStdDeduction = status === 'married' ? 29200 : 14600;
+  const standardDeduction = input.customStandardDeduction !== undefined
+    ? Math.max(0, input.customStandardDeduction)
+    : defaultStdDeduction;
+
   const taxableIncome = Math.max(0, gross - preTaxDeductions - standardDeduction);
 
-  // Federal Brackets 2024
   const singleSlabs = [
     { max: 11600, rate: 0.10, label: 'Up to $11,600 (10%)' },
     { max: 47150, rate: 0.12, label: '$11,600 - $47,150 (12%)' },
@@ -228,18 +256,19 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
 
   // FICA:
   // Social Security: 6.2% up to $168,600 wage limit
-  const ssWageBase = Math.min(gross, 168600);
-  const socialSecurityTax = ssWageBase * 0.062;
+  const ssWageCap = input.customSocialSecurityCap !== undefined ? input.customSocialSecurityCap : 168600;
+  const ssRate = (input.customSocialSecurityRatePercent !== undefined ? input.customSocialSecurityRatePercent : 6.2) / 100;
+  const ssWageBase = Math.min(gross, ssWageCap);
+  const socialSecurityTax = ssWageBase * ssRate;
 
   // Medicare: 1.45% all wages + 0.9% on wages over 200k (single) / 250k (married)
+  const medRate = (input.customMedicareRatePercent !== undefined ? input.customMedicareRatePercent : 1.45) / 100;
   const medicareThreshold = status === 'married' ? 250000 : 200000;
-  const standardMedicare = gross * 0.0145;
+  const standardMedicare = gross * medRate;
   const additionalMedicare = gross > medicareThreshold ? (gross - medicareThreshold) * 0.009 : 0;
   const totalMedicare = standardMedicare + additionalMedicare;
 
   const totalFica = socialSecurityTax + totalMedicare;
-
-  // State Tax
   const stateTax = taxableIncome * stateRate;
 
   const totalTaxes = federalTax + totalFica + stateTax;

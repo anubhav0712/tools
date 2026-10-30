@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useRegion } from '../../core/locale-context';
+import { useSharedProfile } from '../../core/shared-profile-context';
 import { ToolShell } from '../../design-system/tool-shell';
 import type { ToolComponentProps } from '../../core/types';
 import {
@@ -16,6 +17,8 @@ import {
   CheckCircle2,
   Table as TableIcon,
   Percent,
+  Sliders,
+  BookOpen,
 } from 'lucide-react';
 
 export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxOutput>> = ({
@@ -23,21 +26,30 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
   initialInput,
 }) => {
   const { region, config, formatCurrency } = useRegion();
+  const { profile, updateProfile } = useSharedProfile();
 
-  const defaultSalary = region === 'IN' ? 1200000 : 85000;
+  const defaultSalary = initialInput?.annualGrossSalary ?? (profile.annualGrossIncome || (region === 'IN' ? 1200000 : 85000));
 
-  const [grossSalary, setGrossSalary] = useState<number>(initialInput?.annualGrossSalary ?? defaultSalary);
+  const [grossSalary, setGrossSalary] = useState<number>(defaultSalary);
   // India fields
-  const [indiaRegime, setIndiaRegime] = useState<IndiaTaxRegime>(initialInput?.indiaRegime ?? 'new');
+  const [indiaRegime, setIndiaRegime] = useState<IndiaTaxRegime>(initialInput?.indiaRegime ?? profile.indiaTaxRegime ?? 'new');
   const [ded80c, setDed80c] = useState<number>(initialInput?.indiaDeductions80C ?? 150000);
   const [ded80d, setDed80d] = useState<number>(initialInput?.indiaDeductions80D ?? 25000);
   const [hra, setHra] = useState<number>(initialInput?.indiaHraDeduction ?? 100000);
   const [includeEpf, setIncludeEpf] = useState<boolean>(initialInput?.includeEpf ?? true);
 
   // US fields
-  const [filingStatus, setFilingStatus] = useState<UsFilingStatus>(initialInput?.usFilingStatus ?? 'single');
-  const [stateTaxRate, setStateTaxRate] = useState<number>(initialInput?.usStateTaxRate ?? 4.5);
+  const [filingStatus, setFilingStatus] = useState<UsFilingStatus>(initialInput?.usFilingStatus ?? profile.usFilingStatus ?? 'single');
+  const [stateTaxRate, setStateTaxRate] = useState<number>(initialInput?.usStateTaxRate ?? profile.usStateTaxRate ?? 4.5);
   const [preTaxDeduction, setPreTaxDeduction] = useState<number>(initialInput?.usPreTaxDeductions ?? 6000);
+
+  // Advanced overrides state
+  const [customStdDed, setCustomStdDed] = useState<number | undefined>(initialInput?.customStandardDeduction);
+  const [customCess, setCustomCess] = useState<number | undefined>(initialInput?.customCessRatePercent);
+  const [customRebate87a, setCustomRebate87a] = useState<number | undefined>(initialInput?.customSection87aCeiling);
+  const [customEpf, setCustomEpf] = useState<number | undefined>(initialInput?.customEpfAnnual);
+  const [customProfTax, setCustomProfTax] = useState<number | undefined>(initialInput?.customProfessionalTaxAnnual);
+  const [customSsCap, setCustomSsCap] = useState<number | undefined>(initialInput?.customSocialSecurityCap);
 
   const [showBrackets, setShowBrackets] = useState<boolean>(false);
 
@@ -53,6 +65,12 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
       usFilingStatus: filingStatus,
       usStateTaxRate: stateTaxRate,
       usPreTaxDeductions: preTaxDeduction,
+      customStandardDeduction: customStdDed,
+      customCessRatePercent: customCess,
+      customSection87aCeiling: customRebate87a,
+      customEpfAnnual: customEpf,
+      customProfessionalTaxAnnual: customProfTax,
+      customSocialSecurityCap: customSsCap,
     }),
     [
       region,
@@ -65,6 +83,12 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
       filingStatus,
       stateTaxRate,
       preTaxDeduction,
+      customStdDed,
+      customCess,
+      customRebate87a,
+      customEpf,
+      customProfTax,
+      customSsCap,
     ]
   );
 
@@ -80,6 +104,12 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
     setFilingStatus('single');
     setStateTaxRate(4.5);
     setPreTaxDeduction(6000);
+    setCustomStdDed(undefined);
+    setCustomCess(undefined);
+    setCustomRebate87a(undefined);
+    setCustomEpf(undefined);
+    setCustomProfTax(undefined);
+    setCustomSsCap(undefined);
     setShowBrackets(false);
   };
 
@@ -87,8 +117,256 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
     ? Math.round((result.annualTakeHome / result.annualGross) * 100)
     : 100;
 
+  // Sync to shared profile if desired
+  const handleSyncToSharedProfile = () => {
+    updateProfile({
+      annualGrossIncome: grossSalary,
+      indiaTaxRegime: indiaRegime,
+      usFilingStatus: filingStatus,
+      usStateTaxRate: stateTaxRate,
+    });
+  };
+
+  // ---------------- DOCUMENTATION CONTENT ----------------
+  const documentationNode = (
+    <div className="flex flex-col gap-6 text-slate-800 leading-relaxed text-sm">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-indigo-600" />
+          Salary & In-Hand Pay Complete Guide ({region === 'IN' ? 'India' : 'United States'})
+        </h3>
+        <p className="text-slate-600">
+          This calculator simulates your exact take-home paycheck by deducting income taxes, statutory social contributions (EPF or FICA), and local levies from your gross package.
+        </p>
+      </div>
+
+      {region === 'IN' ? (
+        <div className="flex flex-col gap-5">
+          <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex flex-col gap-2">
+            <h4 className="font-bold text-indigo-950">1. Understanding CTC vs In-Hand Salary in India</h4>
+            <p className="text-xs text-indigo-900">
+              <strong>Cost to Company (CTC)</strong> is the total expenditure your employer spends on you annually. It includes components you don't receive directly in your bank account, such as Employer PF, Gratuity, Health Insurance, and bonuses.
+              <strong> In-Hand (Net) Salary</strong> is what actually lands in your bank account after Income Tax (TDS), Employee PF (12%), and Professional Tax (₹200/mo).
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h4 className="font-bold text-slate-900">2. New Tax Regime vs Old Tax Regime (Budget 2024 / FY 2024-25 & 2025-26)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl border border-slate-200 bg-white flex flex-col gap-2">
+                <span className="font-bold text-indigo-700">New Tax Regime (Default)</span>
+                <ul className="list-disc list-inside text-xs text-slate-600 space-y-1">
+                  <li><strong>Standard Deduction:</strong> ₹75,000 for salaried individuals.</li>
+                  <li><strong>Section 87A Rebate:</strong> If your taxable income is up to ₹7,00,000 (meaning gross salary up to <strong>₹7,75,000</strong>), your tax is <strong>₹0 (Zero)</strong>.</li>
+                  <li>Lower, concessional slab rates: 3-7L at 5%, 7-10L at 10%, 10-12L at 15%, 12-15L at 20%, above 15L at 30%.</li>
+                  <li>No paperwork required; deductions under 80C or 80D are not needed.</li>
+                </ul>
+              </div>
+
+              <div className="p-4 rounded-xl border border-slate-200 bg-white flex flex-col gap-2">
+                <span className="font-bold text-slate-700">Old Tax Regime</span>
+                <ul className="list-disc list-inside text-xs text-slate-600 space-y-1">
+                  <li><strong>Standard Deduction:</strong> ₹50,000.</li>
+                  <li>Allows claiming <strong>Section 80C</strong> (up to ₹1,50,000 for ELSS, PPF, EPF, Life Insurance).</li>
+                  <li>Allows <strong>Section 80D</strong> (Health Insurance up to ₹25,000 or ₹50,000).</li>
+                  <li>Allows <strong>HRA (House Rent Allowance)</strong> and Home Loan Interest exemption (up to ₹2,00,000).</li>
+                  <li>Best suited for individuals with heavy home loans and high rent payments exceeding ₹3-4 Lakhs/yr.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="font-bold text-slate-900">3. statutory Deductions</h4>
+            <p className="text-xs text-slate-600">
+              - <strong>Employee Provident Fund (EPF):</strong> 12% of basic salary goes into your government-backed EPF retirement account earning ~8.25% tax-free interest.<br />
+              - <strong>Health & Education Cess:</strong> 4% added to the calculated income tax.<br />
+              - <strong>Professional Tax:</strong> State-level tax, typically capped at ₹2,400/year (₹200/month).
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5">
+          <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex flex-col gap-2">
+            <h4 className="font-bold text-indigo-950">1. Understanding US Paycheck Deductions</h4>
+            <p className="text-xs text-indigo-900">
+              In the United States, your gross pay is subject to three primary layers of withholdings: <strong>Federal Income Tax</strong>, <strong>FICA (Social Security & Medicare)</strong>, and <strong>State / Local Income Tax</strong>.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h4 className="font-bold text-slate-900">2. Federal Brackets & Standard Deduction (2024)</h4>
+            <div className="text-xs text-slate-600 space-y-2">
+              <p>
+                - <strong>Standard Deduction:</strong> The IRS automatically excludes <strong>$14,600</strong> for Single filers and <strong>$29,200</strong> for Married Filing Jointly before any income tax is computed.
+              </p>
+              <p>
+                - <strong>Marginal Tax Brackets:</strong> Federal tax uses progressive brackets (10%, 12%, 22%, 24%, 32%, 35%, 37%). Only the dollars within each bracket are taxed at that bracket's rate.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="font-bold text-slate-900">3. FICA Taxes (Mandatory)</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              - <strong>Social Security:</strong> 6.2% on wages up to the annual wage base limit of <strong>$168,600</strong> (2024 limit). Wages above this cap are 0% Social Security.<br />
+              - <strong>Medicare:</strong> 1.45% on all earnings with no cap. High earners pay an additional 0.9% Medicare surtax on earnings over $200k (Single) or $250k (Married).
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="font-bold text-slate-900">4. Pre-Tax 401(k) and HSA Benefits</h4>
+            <p className="text-xs text-slate-600">
+              Contributing to a traditional 401(k) (up to $23,000 for 2024) or HSA lowers your taxable income dollar-for-dollar, shielding your top marginal tax bracket and lowering your effective tax rate.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ---------------- ADVANCED SETTINGS CONTENT ----------------
+  const advancedSettingsNode = (
+    <div className="flex flex-col gap-6 text-xs text-slate-700">
+      <div className="flex flex-col gap-1 border-b border-slate-100 pb-3">
+        <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-indigo-600" />
+          Advanced Salary & Tax Settings Override
+        </h3>
+        <p className="text-slate-500">
+          Modify statutory rules, standard deduction caps, and custom levies to match specific regional changes or your employer's custom salary structure.
+        </p>
+      </div>
+
+      {region === 'IN' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Custom Standard Deduction ({config.currencySymbol})
+            </label>
+            <input
+              type="number"
+              placeholder="Default: ₹75,000 (New) / ₹50,000 (Old)"
+              value={customStdDed ?? ''}
+              onChange={(e) => setCustomStdDed(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">
+              Override standard deduction for future budget announcements.
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Custom Health & Education Cess (%)
+            </label>
+            <input
+              type="number"
+              step="0.5"
+              placeholder="Default: 4.0%"
+              value={customCess ?? ''}
+              onChange={(e) => setCustomCess(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">Standard cess on income tax.</span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Section 87A Tax Rebate Limit ({config.currencySymbol})
+            </label>
+            <input
+              type="number"
+              placeholder="Default: ₹7,00,000"
+              value={customRebate87a ?? ''}
+              onChange={(e) => setCustomRebate87a(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">
+              Zero tax rebate limit (taxable income threshold).
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Annual Professional Tax ({config.currencySymbol})
+            </label>
+            <input
+              type="number"
+              placeholder="Default: ₹2,400"
+              value={customProfTax ?? ''}
+              onChange={(e) => setCustomProfTax(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">
+              Set to ₹0 for states without professional tax.
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Custom Standard Deduction ($)
+            </label>
+            <input
+              type="number"
+              placeholder="Default: $14,600 Single / $29,200 Married"
+              value={customStdDed ?? ''}
+              onChange={(e) => setCustomStdDed(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">Or enter your itemized deductions.</span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <label className="font-semibold text-slate-800">
+              Social Security Wage Cap ($)
+            </label>
+            <input
+              type="number"
+              placeholder="Default: $168,600"
+              value={customSsCap ?? ''}
+              onChange={(e) => setCustomSsCap(e.target.value ? Number(e.target.value) : undefined)}
+              className="p-2 rounded-lg bg-white border border-slate-200 font-mono text-slate-900"
+            />
+            <span className="text-[10px] text-slate-500">Max salary subject to 6.2% Social Security.</span>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={() => {
+            setCustomStdDed(undefined);
+            setCustomCess(undefined);
+            setCustomRebate87a(undefined);
+            setCustomEpf(undefined);
+            setCustomProfTax(undefined);
+            setCustomSsCap(undefined);
+          }}
+          className="text-xs text-slate-500 hover:text-slate-800 cursor-pointer font-medium underline"
+        >
+          Reset Advanced Settings to Government Defaults
+        </button>
+
+        <span className="text-emerald-700 font-medium flex items-center gap-1">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Live calculation updated
+        </span>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+      advancedSettings={advancedSettingsNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Input Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">
@@ -121,9 +399,17 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
               onChange={(e) => setGrossSalary(Number(e.target.value))}
               className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-100 rounded-lg"
             />
-            <span className="text-[11px] text-slate-500 font-mono">
-              Equivalent to {formatCurrency(Math.round(grossSalary / 12))}/month gross
-            </span>
+            <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>{formatCurrency(Math.round(grossSalary / 12))}/month gross</span>
+              <button
+                type="button"
+                onClick={handleSyncToSharedProfile}
+                className="text-indigo-600 hover:underline cursor-pointer font-sans font-medium"
+                title="Save as default across all tools"
+              >
+                Save to Shared Profile
+              </button>
+            </div>
           </div>
 
           {/* Region Specific Controls */}

@@ -12,6 +12,7 @@ import {
   Percent,
   Calendar,
   ShieldCheck,
+  BookOpen,
 } from 'lucide-react';
 
 export const AutoLoanUI: React.FC<ToolComponentProps<AutoLoanInput, AutoLoanOutput>> = ({
@@ -59,8 +60,43 @@ export const AutoLoanUI: React.FC<ToolComponentProps<AutoLoanInput, AutoLoanOutp
     setRate(defaultRate);
   };
 
+  const documentationNode = (
+    <div className="flex flex-col gap-5 text-sm text-slate-800 leading-relaxed">
+      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-indigo-600" />
+        Car Loan & Auto Financing Guide
+      </h3>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">1. The 20/4/10 Rule of Car Buying</h4>
+        <p className="text-xs text-slate-600">
+          Financial advisors widely recommend the 20/4/10 rule to avoid being car-poor:
+          Put down at least <strong>20%</strong> in cash, finance the car for no more than <strong>4 years (48 months)</strong>, and ensure all vehicle expenses (loan EMI + insurance + fuel) stay below <strong>10%</strong> of your gross monthly income.
+        </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col gap-2">
+        <h4 className="font-bold text-amber-950">2. Beware of Long 72-84 Month Loans</h4>
+        <p className="text-xs text-amber-900">
+          While a 72 or 84-month loan lowers your monthly payment, it dramatically escalates total interest costs and puts you "underwater" (owing more on the loan than the car is worth as depreciation kicks in).
+        </p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-bold text-slate-900">3. Taxes & On-Road Expenses</h4>
+        <p className="text-xs text-slate-600">
+          {region === 'IN'
+            ? 'In India, on-road prices include significant RTO registration fees (8-14%), road tax, and mandatory insurance. Rolling these into the car loan increases your monthly EMI and interest bill.'
+            : 'In the US, state and local sales taxes (4-10%) plus title and dealer registration fees add thousands of dollars to MSRP. Rolling them into financing increases your loan balance.'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <ToolShell tool={tool} onReset={handleReset}>
+    <ToolShell
+      tool={tool}
+      onReset={handleReset}
+      inputData={input}
+      documentation={documentationNode}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Controls Column */}
         <div className="lg:col-span-6 flex flex-col gap-5 sm:gap-6">

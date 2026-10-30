@@ -6,8 +6,10 @@ import {
   ShieldCheck,
   Check,
   RotateCcw,
-  Code2,
   Share2,
+  Terminal,
+  X,
+  Copy,
 } from 'lucide-react';
 import { Button } from './button';
 import { Badge } from './badge';
@@ -32,30 +34,9 @@ export const ToolShell: React.FC<ToolShellProps> = ({
   inputData,
   children,
 }) => {
-  const [copiedAgent, setCopiedAgent] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
-  const [showMcpSchema, setShowMcpSchema] = useState(false);
-
-  const handleCopyAgentContext = async () => {
-    const payload = {
-      tool: tool.metadata.id,
-      name: tool.metadata.name,
-      description: tool.metadata.description,
-      input: inputData,
-      output: outputData,
-    };
-    const markdownContext = [
-      `### Tool Context: ${tool.metadata.name}`,
-      `*Description*: ${tool.metadata.description}`,
-      '```json',
-      JSON.stringify(payload, null, 2),
-      '```',
-    ].join('\n');
-
-    await navigator.clipboard.writeText(markdownContext);
-    setCopiedAgent(true);
-    setTimeout(() => setCopiedAgent(false), 2000);
-  };
+  const [showAgentModal, setShowAgentModal] = useState(false);
+  const [copiedModalJson, setCopiedModalJson] = useState(false);
 
   const handleShareUrl = async () => {
     let url = window.location.href;
@@ -66,6 +47,19 @@ export const ToolShell: React.FC<ToolShellProps> = ({
     await navigator.clipboard.writeText(url);
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 2000);
+  };
+
+  const handleCopyAgentContext = async () => {
+    const payload = {
+      tool: tool.metadata.id,
+      name: tool.metadata.name,
+      description: tool.metadata.description,
+      input: inputData,
+      output: outputData,
+    };
+    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+    setCopiedModalJson(true);
+    setTimeout(() => setCopiedModalJson(false), 2000);
   };
 
   return (
@@ -99,10 +93,17 @@ export const ToolShell: React.FC<ToolShellProps> = ({
                 {tool.metadata.category}
               </Badge>
               {tool.agent.mcp ? (
-                <Badge variant="agent">
-                  <Bot className="w-3 h-3 text-purple-400" />
-                  <span>MCP Ready</span>
-                </Badge>
+                <button
+                  type="button"
+                  onClick={() => setShowAgentModal(true)}
+                  title="Click to view MCP & API spec"
+                  className="cursor-pointer transition-opacity hover:opacity-80"
+                >
+                  <Badge variant="agent">
+                    <Bot className="w-3 h-3 text-purple-400" />
+                    <span>MCP Ready</span>
+                  </Badge>
+                </button>
               ) : (
                 <Badge variant="gui">
                   <Sparkles className="w-3 h-3 text-emerald-400" />
@@ -119,14 +120,14 @@ export const ToolShell: React.FC<ToolShellProps> = ({
             </p>
           </div>
 
-          {/* Action Bar */}
+          {/* Action Bar (Focused on human user workflow) */}
           <div className="flex items-center gap-2 flex-wrap">
             {tool.agent.deepLink !== false && (
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleShareUrl}
-                title="Copy shareable link with input"
+                title="Copy shareable link with current input"
               >
                 {copiedShare ? (
                   <>
@@ -140,39 +141,6 @@ export const ToolShell: React.FC<ToolShellProps> = ({
                   </>
                 )}
               </Button>
-            )}
-
-            {tool.agent.mcp && (
-              <>
-                <Button
-                  variant="agent"
-                  size="sm"
-                  onClick={handleCopyAgentContext}
-                  title="Copy inputs and outputs formatted as markdown context for AI agents"
-                >
-                  {copiedAgent ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-purple-300" />
-                      <span>Copied for Agent</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bot className="w-3.5 h-3.5 text-purple-300" />
-                      <span>Copy for Agent</span>
-                    </>
-                  )}
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setShowMcpSchema(!showMcpSchema)}
-                  title="View MCP Tool Schema definition"
-                >
-                  <Code2 className="w-3.5 h-3.5 text-slate-400" />
-                  <span>MCP Schema</span>
-                </Button>
-              </>
             )}
 
             {onReset && (
@@ -191,51 +159,120 @@ export const ToolShell: React.FC<ToolShellProps> = ({
         </div>
       </div>
 
-      {/* MCP Schema Drawer / Modal View */}
-      {showMcpSchema && tool.agent.mcp && (
-        <div className="p-4 rounded-xl border border-purple-900/60 bg-purple-950/30 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-purple-300 uppercase tracking-wider">
-              MCP Tool Definition ({tool.metadata.id})
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowMcpSchema(false)}
-              className="text-xs text-purple-300 hover:text-white h-6 px-2"
-            >
-              Close
-            </Button>
-          </div>
-          <pre className="p-3 rounded-lg bg-slate-950 font-mono text-xs text-purple-200 overflow-x-auto max-h-60 border border-purple-900/40">
-            {JSON.stringify(
-              {
-                name: tool.metadata.id,
-                description: tool.metadata.description,
-                agentPrompt: tool.agent.agentPrompt,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </div>
-      )}
-
       {/* Main Workspace Area */}
       <div className="flex flex-col gap-6">{children}</div>
 
-      {/* Tool Status Footer */}
-      <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-slate-900/60 border border-slate-800 text-xs text-slate-500">
+      {/* Tool Status & Privacy Footer */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-3 px-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-500">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Privacy Guaranteed: Processed 100% locally in browser</span>
+          {typeof executionTimeMs === 'number' && (
+            <>
+              <span className="text-slate-700">•</span>
+              <span className="font-mono text-slate-400">
+                {executionTimeMs.toFixed(2)}ms
+              </span>
+            </>
+          )}
         </div>
-        {typeof executionTimeMs === 'number' && (
-          <div className="font-mono text-slate-400">
-            Execution: <span className="text-slate-200">{executionTimeMs.toFixed(2)}ms</span>
-          </div>
+
+        {tool.agent.mcp && (
+          <button
+            type="button"
+            onClick={() => setShowAgentModal(true)}
+            className="flex items-center gap-1.5 text-slate-400 hover:text-purple-300 transition-colors"
+          >
+            <Terminal className="w-3.5 h-3.5" />
+            <span>Developer / Agent Spec</span>
+          </button>
         )}
       </div>
+
+      {/* Developer & Agent Spec Modal */}
+      {showAgentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/40">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-purple-400" />
+                <h3 className="font-semibold text-sm text-white">
+                  Agent & Developer Spec: {tool.metadata.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAgentModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-md"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 flex flex-col gap-4 text-xs text-slate-300 max-h-[70vh] overflow-y-auto">
+              <div>
+                <span className="text-slate-400 font-medium">Tool ID:</span>
+                <code className="ml-2 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 font-mono text-purple-300">
+                  {tool.metadata.id}
+                </code>
+              </div>
+
+              {tool.agent.agentPrompt && (
+                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-300">
+                  <span className="font-semibold text-slate-400 block mb-1">Agent Instructions:</span>
+                  <p>{tool.agent.agentPrompt}</p>
+                </div>
+              )}
+
+              <div>
+                <span className="font-semibold text-slate-400 block mb-1">Local MCP Server Invocation:</span>
+                <pre className="p-3 rounded-lg bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800 overflow-x-auto">
+{`npx tsx scripts/mcp-server.ts`}
+                </pre>
+              </div>
+
+              {Boolean(inputData || outputData) && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-slate-400">Current Payload (JSON):</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyAgentContext}
+                      className="text-xs h-6 px-2 text-purple-300 gap-1"
+                    >
+                      {copiedModalJson ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span>Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Copy Payload</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <pre className="p-3 rounded-lg bg-slate-950 font-mono text-[11px] text-slate-300 border border-slate-800 overflow-x-auto max-h-48">
+                    {JSON.stringify({ input: inputData, output: outputData }, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end px-5 py-3 border-t border-slate-800 bg-slate-950/40">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAgentModal(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

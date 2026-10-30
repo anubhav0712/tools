@@ -1,0 +1,97 @@
+{
+  "server": {
+    "name": "tools-client-suite",
+    "version": "0.1.0",
+    "description": "Privacy-first, 100% local client-side tool execution suite."
+  },
+  "tools": [
+    {
+      "name": "base64-converter",
+      "description": "Encode and decode standard or URL-safe Base64 strings with full UTF-8 Unicode support.",
+      "inputSchema": {
+        "unknownKeys": "strip",
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          }
+        },
+        "typeName": "ZodObject"
+      },
+      "outputSchema": {
+        "unknownKeys": "strip",
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          }
+        },
+        "typeName": "ZodObject"
+      },
+      "metadata": {
+        "category": "converter",
+        "version": "1.0.0",
+        "keywords": [
+          "base64",
+          "encode",
+          "decode",
+          "b64",
+          "urlsafe",
+          "ascii",
+          "utf8"
+        ],
+        "deepLinkSupported": true
+      }
+    },
+    {
+      "name": "json-formatter",
+      "description": "Format, validate, sort object keys, or minify JSON data with instant local parsing and syntax validation.",
+      "inputSchema": {
+        "unknownKeys": "strip",
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          }
+        },
+        "typeName": "ZodObject"
+      },
+      "outputSchema": {
+        "unknownKeys": "strip",
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          }
+        },
+        "typeName": "ZodObject"
+      },
+      "metadata": {
+        "category": "developer",
+        "version": "1.0.0",
+        "keywords": [
+          "json",
+          "format",
+          "minify",
+          "prettify",
+          "validate",
+          "sort keys",
+          "beautify"
+        ],
+        "deepLinkSupported": true
+      }
+    }
+  ]
+}

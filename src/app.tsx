@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { registry } from './core/registry';
 import { parseUrlState, setUrlTool } from './core/url-state';
+import { generateMcpManifest } from './core/mcp-generator';
 import { Header } from './shell/header';
 import { CatalogGrid } from './shell/catalog-grid';
 import { CommandPalette } from './shell/command-palette';
@@ -95,13 +96,15 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                const json = JSON.stringify(registry.getMcpReady().map((t) => ({ id: t.metadata.id, description: t.metadata.description })), null, 2);
+                const manifest = generateMcpManifest();
+                const json = JSON.stringify(manifest, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'mcp-tools.json';
+                a.download = 'mcp-tools-manifest.json';
                 a.click();
+                URL.revokeObjectURL(url);
               }}
               className="hover:text-indigo-400 transition-colors"
             >

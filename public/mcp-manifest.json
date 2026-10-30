@@ -9,30 +9,58 @@
       "name": "base64-converter",
       "description": "Encode and decode standard or URL-safe Base64 strings with full UTF-8 Unicode support.",
       "inputSchema": {
-        "unknownKeys": "strip",
-        "catchall": {
-          "_def": {
-            "typeName": "ZodNever"
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text or Base64 string to encode/decode"
           },
-          "~standard": {
-            "version": 1,
-            "vendor": "zod"
+          "mode": {
+            "type": "string",
+            "enum": [
+              "encode",
+              "decode"
+            ],
+            "default": "encode",
+            "description": "Operation mode: encode or decode"
+          },
+          "urlSafe": {
+            "type": "boolean",
+            "default": false,
+            "description": "Use URL-safe alphabet (- and _ instead of + and /)"
           }
         },
-        "typeName": "ZodObject"
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
       },
       "outputSchema": {
-        "unknownKeys": "strip",
-        "catchall": {
-          "_def": {
-            "typeName": "ZodNever"
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "Encoded or decoded string"
           },
-          "~standard": {
-            "version": 1,
-            "vendor": "zod"
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the operation succeeded"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if decoding failed"
+          },
+          "byteSize": {
+            "type": "number",
+            "description": "Byte length of the result"
           }
         },
-        "typeName": "ZodObject"
+        "required": [
+          "result",
+          "isValid",
+          "byteSize"
+        ],
+        "additionalProperties": false
       },
       "metadata": {
         "category": "converter",
@@ -46,37 +74,69 @@
           "ascii",
           "utf8"
         ],
-        "deepLinkSupported": true
+        "deepLinkSupported": true,
+        "agentPrompt": "Encode plain text to Base64 or decode Base64 strings back to UTF-8 text."
       }
     },
     {
       "name": "json-formatter",
       "description": "Format, validate, sort object keys, or minify JSON data with instant local parsing and syntax validation.",
       "inputSchema": {
-        "unknownKeys": "strip",
-        "catchall": {
-          "_def": {
-            "typeName": "ZodNever"
+        "type": "object",
+        "properties": {
+          "rawJson": {
+            "type": "string",
+            "description": "The raw JSON string to format, validate, or minify"
           },
-          "~standard": {
-            "version": 1,
-            "vendor": "zod"
+          "indent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 8,
+            "default": 2,
+            "description": "Indentation spaces (0 for minification, default 2)"
+          },
+          "sortKeys": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to sort JSON object keys alphabetically"
           }
         },
-        "typeName": "ZodObject"
+        "required": [
+          "rawJson"
+        ],
+        "additionalProperties": false
       },
       "outputSchema": {
-        "unknownKeys": "strip",
-        "catchall": {
-          "_def": {
-            "typeName": "ZodNever"
+        "type": "object",
+        "properties": {
+          "formatted": {
+            "type": "string",
+            "description": "Formatted or minified JSON string"
           },
-          "~standard": {
-            "version": 1,
-            "vendor": "zod"
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the input was valid JSON"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if invalid"
+          },
+          "lineCount": {
+            "type": "number",
+            "description": "Number of lines in the output"
+          },
+          "byteSize": {
+            "type": "number",
+            "description": "Output size in bytes"
           }
         },
-        "typeName": "ZodObject"
+        "required": [
+          "formatted",
+          "isValid",
+          "lineCount",
+          "byteSize"
+        ],
+        "additionalProperties": false
       },
       "metadata": {
         "category": "developer",
@@ -90,7 +150,8 @@
           "sort keys",
           "beautify"
         ],
-        "deepLinkSupported": true
+        "deepLinkSupported": true,
+        "agentPrompt": "Use this tool to safely format, validate, minify, or canonicalize JSON payloads without sending data to external APIs."
       }
     }
   ]

@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "new-tool": "tsx scripts/new-tool.ts",
-    "export-mcp": "tsx scripts/export-mcp.ts"
+    "export-mcp": "tsx scripts/export-mcp.ts",
+    "mcp": "tsx scripts/mcp-server.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -18,7 +19,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.6",

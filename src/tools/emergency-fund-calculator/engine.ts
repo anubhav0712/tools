@@ -1,3 +1,5 @@
+export type EmploymentStability = 'stable_dual_income' | 'salaried_single_income' | 'freelancer_variable_income';
+
 export interface EmergencyFundInput {
   housingExpense: number;       // Rent or Mortgage
   foodExpense: number;          // Groceries & Food essentials
@@ -8,6 +10,16 @@ export interface EmergencyFundInput {
   bufferMonths: number;         // 3, 6, 9, or 12 months
   currentSavings: number;       // Money already set aside
   monthlySavingsContribution?: number; // How much user can save each month
+  // Enterprise fields
+  employmentStability?: EmploymentStability;
+  dependentsCount?: number;
+  hysaYieldPercent?: number;    // e.g. 4.5% US HYSA, 6.75% India Liquid Fund
+}
+
+export interface ThreeTierLiquidityPlan {
+  tier1ImmediateChecking: number; // 1 month of instant checking account cash
+  tier2HighYieldSavings: number;  // 2-3 months in HYSA / Sweep FD
+  tier3LiquidFundsOrFds: number;  // Remainder in liquid mutual funds / ultra-short debt
 }
 
 export interface EmergencyFundOutput {
@@ -23,6 +35,10 @@ export interface EmergencyFundOutput {
     amount: number;
     percent: number;
   }[];
+  // Enterprise Advisory Metrics
+  recommendedBufferMonths: number;
+  currentRunwayMonths: number;
+  threeTierLiquidityPlan: ThreeTierLiquidityPlan;
 }
 
 export function executeEmergencyFund(input: EmergencyFundInput): EmergencyFundOutput {
@@ -38,6 +54,17 @@ export function executeEmergencyFund(input: EmergencyFundInput): EmergencyFundOu
   const currentSavings = Math.max(0, input.currentSavings || 0);
   const monthlyContrib = Math.max(0, input.monthlySavingsContribution || 0);
 
+  // CFP Board Intelligent Buffer Recommendation
+  let recommendedBufferMonths = 6;
+  if (input.employmentStability === 'stable_dual_income') {
+    recommendedBufferMonths = 4;
+  } else if (input.employmentStability === 'freelancer_variable_income') {
+    recommendedBufferMonths = 9;
+  }
+  if ((input.dependentsCount || 0) >= 2) {
+    recommendedBufferMonths = Math.min(12, recommendedBufferMonths + 2);
+  }
+
   const targetFundAmount = totalMonthlyExpense * bufferMonths;
   const shortfallOrSurplus = currentSavings - targetFundAmount;
   const isFullyFunded = shortfallOrSurplus >= 0;
@@ -50,6 +77,16 @@ export function executeEmergencyFund(input: EmergencyFundInput): EmergencyFundOu
   const monthsToFullFund = monthlyContrib > 0 && remainingShortfall > 0
     ? Math.ceil(remainingShortfall / monthlyContrib)
     : 0;
+
+  // Current survival runway if income stopped today
+  const currentRunwayMonths = totalMonthlyExpense > 0
+    ? Number((currentSavings / totalMonthlyExpense).toFixed(1))
+    : 0;
+
+  // Three-Tier Liquidity Allocation Plan
+  const tier1ImmediateChecking = Math.round(Math.min(targetFundAmount, totalMonthlyExpense * 1));
+  const tier2HighYieldSavings = Math.round(Math.min(targetFundAmount - tier1ImmediateChecking, totalMonthlyExpense * 2.5));
+  const tier3LiquidFundsOrFds = Math.max(0, targetFundAmount - (tier1ImmediateChecking + tier2HighYieldSavings));
 
   const items = [
     { label: 'Housing & Rent', amount: housing },
@@ -76,5 +113,12 @@ export function executeEmergencyFund(input: EmergencyFundInput): EmergencyFundOu
     monthsToFullFund,
     isFullyFunded,
     expenseBreakdown,
+    recommendedBufferMonths,
+    currentRunwayMonths,
+    threeTierLiquidityPlan: {
+      tier1ImmediateChecking,
+      tier2HighYieldSavings,
+      tier3LiquidFundsOrFds,
+    },
   };
 }

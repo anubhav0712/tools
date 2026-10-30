@@ -40,4 +40,24 @@ describe('Emergency Fund Calculator Engine', () => {
     expect(res.isFullyFunded).toBe(true);
     expect(res.percentFunded).toBe(125);
   });
+
+  it('provides intelligent buffer sizing and three-tier liquidity allocations', () => {
+    const res = executeEmergencyFund({
+      housingExpense: 2000,
+      foodExpense: 1000,
+      utilitiesExpense: 500,
+      loanEmisExpense: 500,
+      insuranceHealthcareExpense: 0,
+      miscEssentialsExpense: 0,
+      bufferMonths: 6,
+      currentSavings: 8000,
+      employmentStability: 'freelancer_variable_income',
+      dependentsCount: 2,
+    });
+
+    expect(res.recommendedBufferMonths).toBeGreaterThanOrEqual(9);
+    expect(res.currentRunwayMonths).toBe(2); // $8,000 / $4,000 monthly burn = 2 months
+    expect(res.threeTierLiquidityPlan.tier1ImmediateChecking).toBe(4000); // 1 month instant checking
+    expect(res.threeTierLiquidityPlan.tier2HighYieldSavings).toBeGreaterThan(0);
+  });
 });

@@ -44,4 +44,20 @@ describe('SIP Calculator Engine', () => {
     expect(res.totalInvested).toBe(0);
     expect(res.maturityValue).toBe(0);
   });
+
+  it('calculates inflation-adjusted real purchasing power and tax drag correctly', () => {
+    const res = executeSipCalculator({
+      monthlyInvestment: 10000,
+      annualExpectedReturn: 12,
+      investmentYears: 15,
+      inflationRatePercent: 6,
+      capitalGainsTaxPercent: 12.5,
+      capitalGainsExemption: 125000,
+    });
+
+    expect(res.realMaturityValue).toBeLessThan(res.maturityValue);
+    expect(res.purchasingPowerLoss).toBeGreaterThan(0);
+    expect(res.estimatedTax).toBeGreaterThan(0);
+    expect(res.postTaxMaturityValue).toBe(res.maturityValue - (res.estimatedTax ?? 0));
+  });
 });

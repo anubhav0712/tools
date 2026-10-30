@@ -8,6 +8,10 @@ export interface RetirementInput {
   postRetirementReturnRate: number; // e.g. 7%
   currentSavings: number;
   monthlyContribution: number;
+  // Enterprise fields
+  annualStepUpSavingsPercent?: number; // Career salary step-up
+  postRetirementGuaranteedIncomeAnnual?: number; // Social Security / NPS / pension
+  swrPercent?: number; // Custom Safe Withdrawal Rate (default 4%)
 }
 
 export interface RetirementYearMilestone {
@@ -31,6 +35,9 @@ export interface RetirementOutput {
   fireNumber25x: number; // 4% rule
   fireNumber33x: number; // 3% rule
   timeline: RetirementYearMilestone[];
+  // Enterprise Metrics
+  netRequiredCorpusAfterPension?: number;
+  swrSafeWithdrawalAmount?: number;
 }
 
 export function executeRetirementPlanner(input: RetirementInput): RetirementOutput {
@@ -44,52 +51,75 @@ export function executeRetirementPlanner(input: RetirementInput): RetirementOutp
   const inflationRate = Math.max(0, input.inflationRatePercent || 0) / 100;
   const preReturnRate = Math.max(0, input.preRetirementReturnRate || 0) / 100;
   const postReturnRate = Math.max(0, input.postRetirementReturnRate || 0) / 100;
+  const stepUpRate = Math.max(0, input.annualStepUpSavingsPercent || 0) / 100;
+  const guaranteedPension = Math.max(0, input.postRetirementGuaranteedIncomeAnnual || 0);
 
   const currentMonthlyExpense = Math.max(0, input.currentMonthlyExpense || 0);
   const currentSavings = Math.max(0, input.currentSavings || 0);
-  const monthlyContribution = Math.max(0, input.monthlyContribution || 0);
+  const initialMonthlyContribution = Math.max(0, input.monthlyContribution || 0);
 
   // 1. Calculate Monthly Expense adjusted for inflation at retirement age
-  // FV = PV * (1 + inflation)^yearsToRetire
   const inflationFactorAtRetire = Math.pow(1 + inflationRate, yearsToRetire);
   const monthlyExpenseAtRetirement = currentMonthlyExpense * inflationFactorAtRetire;
   const annualExpenseAtRetirement = monthlyExpenseAtRetirement * 12;
 
-  // 2. Real rate of return during retirement (Fisher equation: (1 + r) / (1 + i) - 1)
+  // 2. Real rate of return during retirement (Fisher equation)
   const realPostReturnRate = (1 + postReturnRate) / (1 + inflationRate) - 1;
 
   // 3. Required Corpus at retirement using Present Value of Growing Annuity
-  // If real return > 0: PV = Expense * (1 - (1 + realRate)^-n) / realRate
+  // Net of guaranteed pension streams
+  const netAnnualExpenseNeeded = Math.max(0, annualExpenseAtRetirement - guaranteedPension);
+
   let requiredCorpus = 0;
+  let netRequiredCorpusAfterPension = 0;
+
   if (Math.abs(realPostReturnRate) < 0.0001) {
     requiredCorpus = annualExpenseAtRetirement * yearsInRetire;
+    netRequiredCorpusAfterPension = netAnnualExpenseNeeded * yearsInRetire;
   } else {
-    requiredCorpus =
-      annualExpenseAtRetirement *
-      ((1 - Math.pow(1 + realPostReturnRate, -yearsInRetire)) / realPostReturnRate);
+    const annuityFactor = (1 - Math.pow(1 + realPostReturnRate, -yearsInRetire)) / realPostReturnRate;
+    requiredCorpus = annualExpenseAtRetirement * annuityFactor;
+    netRequiredCorpusAfterPension = netAnnualExpenseNeeded * annuityFactor;
   }
   requiredCorpus = Math.max(0, Math.round(requiredCorpus));
+  netRequiredCorpusAfterPension = Math.max(0, Math.round(netRequiredCorpusAfterPension));
 
-  // 4. Project Corpus at retirement age based on current savings and contributions
-  // Growth of current savings:
-  const savingsFutureValue = currentSavings * Math.pow(1 + preReturnRate, yearsToRetire);
+  // The actual corpus target considering guaranteed pension
+  const activeRequiredCorpus = guaranteedPension > 0 ? netRequiredCorpusAfterPension : requiredCorpus;
 
-  // Growth of monthly contributions:
-  // FV of annuity = P * [((1 + r/12)^(n*12) - 1) / (r/12)]
+  // 4. Project Corpus at retirement age based on current savings and contributions (with optional annual step-up)
   const monthlyPreRate = preReturnRate / 12;
-  const totalMonths = yearsToRetire * 12;
-  const contributionsFutureValue = monthlyPreRate > 0
-    ? monthlyContribution * ((Math.pow(1 + monthlyPreRate, totalMonths) - 1) / monthlyPreRate)
-    : monthlyContribution * totalMonths;
+  let projectedSavingsCorpus = currentSavings * Math.pow(1 + preReturnRate, yearsToRetire);
+  let projectedContributionsCorpus = 0;
 
-  const projectedCorpus = Math.round(savingsFutureValue + contributionsFutureValue);
-  const shortfallOrSurplus = projectedCorpus - requiredCorpus;
+  if (stepUpRate > 0) {
+    // Month-by-month accumulation with annual step-up
+    let currentMonthly = initialMonthlyContribution;
+    let accum = 0;
+    for (let m = 1; m <= yearsToRetire * 12; m++) {
+      accum = (accum + currentMonthly) * (1 + monthlyPreRate);
+      if (m % 12 === 0) {
+        currentMonthly *= (1 + stepUpRate);
+      }
+    }
+    projectedContributionsCorpus = accum;
+  } else {
+    // Closed-form FV of monthly annuity
+    const totalMonths = yearsToRetire * 12;
+    projectedContributionsCorpus = monthlyPreRate > 0
+      ? initialMonthlyContribution * ((Math.pow(1 + monthlyPreRate, totalMonths) - 1) / monthlyPreRate)
+      : initialMonthlyContribution * totalMonths;
+  }
+
+  const projectedCorpus = Math.round(projectedSavingsCorpus + projectedContributionsCorpus);
+  const shortfallOrSurplus = projectedCorpus - activeRequiredCorpus;
   const isRetirementReady = shortfallOrSurplus >= 0;
 
   // 5. Recommended monthly saving needed if there's a shortfall
-  let recommendedMonthlySaving = monthlyContribution;
+  let recommendedMonthlySaving = initialMonthlyContribution;
   if (shortfallOrSurplus < 0) {
-    const additionalCorpusNeeded = requiredCorpus - savingsFutureValue;
+    const additionalCorpusNeeded = activeRequiredCorpus - projectedSavingsCorpus;
+    const totalMonths = yearsToRetire * 12;
     if (additionalCorpusNeeded > 0 && monthlyPreRate > 0) {
       recommendedMonthlySaving = Math.round(
         additionalCorpusNeeded / ((Math.pow(1 + monthlyPreRate, totalMonths) - 1) / monthlyPreRate)
@@ -97,11 +127,13 @@ export function executeRetirementPlanner(input: RetirementInput): RetirementOutp
     }
   }
 
-  // 6. FIRE 4% rule (25x) and 3.3% rule (30x-33x) in retirement dollars
+  // 6. FIRE metrics
   const fireNumber25x = Math.round(annualExpenseAtRetirement * 25);
   const fireNumber33x = Math.round(annualExpenseAtRetirement * 33.33);
+  const swrRate = (input.swrPercent || 4) / 100;
+  const swrSafeWithdrawalAmount = Math.round(projectedCorpus * swrRate);
 
-  // 7. Timeline trajectory with exact monthly compounding matching projectedCorpus
+  // 7. Timeline trajectory
   const timeline: RetirementYearMilestone[] = [];
 
   for (let yr = 1; yr <= yearsToRetire; yr++) {
@@ -110,8 +142,8 @@ export function executeRetirementPlanner(input: RetirementInput): RetirementOutp
       const monthsElapsed = yr * 12;
       const yrSavingsFV = currentSavings * Math.pow(1 + preReturnRate, yr);
       const yrContribFV = monthlyPreRate > 0
-        ? monthlyContribution * ((Math.pow(1 + monthlyPreRate, monthsElapsed) - 1) / monthlyPreRate)
-        : monthlyContribution * monthsElapsed;
+        ? initialMonthlyContribution * ((Math.pow(1 + monthlyPreRate, monthsElapsed) - 1) / monthlyPreRate)
+        : initialMonthlyContribution * monthsElapsed;
       const milestoneCorpus = Math.round(yrSavingsFV + yrContribFV);
 
       timeline.push({
@@ -137,5 +169,7 @@ export function executeRetirementPlanner(input: RetirementInput): RetirementOutp
     fireNumber25x,
     fireNumber33x,
     timeline,
+    netRequiredCorpusAfterPension,
+    swrSafeWithdrawalAmount,
   };
 }

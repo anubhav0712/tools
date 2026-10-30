@@ -35,4 +35,21 @@ describe('Car Loan & Auto Financing Engine', () => {
     expect(res.monthlyPayment).toBe(0);
     expect(res.totalInterestPaid).toBe(0);
   });
+
+  it('correctly models underwater trade-ins with negative equity rolled into loan', () => {
+    // $30,000 vehicle with $5,000 trade-in value but $8,000 still owed ($3,000 negative equity)
+    const res = executeAutoLoan({
+      vehiclePrice: 30000,
+      downPayment: 2000,
+      tradeInValue: 5000,
+      tradeInLoanOwed: 8000,
+      loanTermMonths: 60,
+      annualInterestRate: 6.0,
+      salesTaxRatePercent: 0,
+    });
+
+    expect(res.netTradeInValue).toBe(-3000);
+    expect(res.loanAmountFinanced).toBe(31000);
+    expect(res.loanToValueRatio).toBeGreaterThan(100);
+  });
 });

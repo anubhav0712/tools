@@ -9,6 +9,45 @@ export type ToolCategory =
   | 'everyday'
   | 'visual';
 
+export type ParameterDataType = 'number' | 'string' | 'boolean' | 'select' | 'array';
+
+export type ParameterUnit =
+  | 'currency'
+  | 'percent'
+  | 'years'
+  | 'months'
+  | 'days'
+  | 'ratio'
+  | 'none';
+
+export interface ToolParameterOption {
+  label: string;
+  value: string | number;
+  description?: string;
+}
+
+export interface ToolParameterSchema {
+  name: string;
+  label: string;
+  description: string;
+  dataType: ParameterDataType;
+  unit?: ParameterUnit;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
+  defaultValue?: any;
+  options?: ToolParameterOption[];
+  group?: 'basic' | 'advanced' | 'tax' | 'fees' | 'scenario';
+  regulatoryReference?: string;
+}
+
+export interface FormulaCitation {
+  name: string;
+  formula: string;
+  description: string;
+}
+
 export interface ToolMetadata {
   id: string;               // Unique slug (e.g. "json-formatter")
   name: string;             // Human-readable title
@@ -17,6 +56,11 @@ export interface ToolMetadata {
   keywords: string[];
   version: string;
   icon: string;             // Lucide icon identifier
+  // Enterprise fields
+  regulatoryStandards?: string[];
+  supportedRegions?: ('IN' | 'US' | 'GLOBAL')[];
+  formulaCitations?: FormulaCitation[];
+  parameters?: Record<string, ToolParameterSchema>;
 }
 
 export interface ToolComponentProps<TInput = unknown, TOutput = unknown> {

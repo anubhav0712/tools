@@ -42,4 +42,37 @@ describe('Credit Card & Debt Payoff Engine', () => {
 
     expect(res.isPayable).toBe(false);
   });
+
+  it('handles zero balance safely without false unpayable or trap warnings', () => {
+    const res = executeDebtPayoff({
+      balance: 0,
+      annualInterestRate: 20,
+      monthlyPayment: 0,
+    });
+
+    expect(res.isPayable).toBe(true);
+    expect(res.monthsToPayoff).toBe(0);
+    expect(res.totalInterestPaid).toBe(0);
+    expect(res.totalAmountPaid).toBe(0);
+    expect(res.minimumPaymentTrapWarning).toBe(false);
+    expect(res.schedule).toHaveLength(0);
+  });
+
+  it('computes CARD Act 36-month payment and evaluates 0% balance transfer savings', () => {
+    const res = executeDebtPayoff({
+      balance: 6000,
+      annualInterestRate: 24,
+      monthlyPayment: 250,
+      balanceTransferOffer: {
+        promotionalAprPercent: 0,
+        promotionalMonths: 18,
+        transferFeePercent: 3,
+      },
+    });
+
+    expect(res.cardAct36MonthPayment).toBeGreaterThan(0);
+    expect(res.cardAct36MonthPayment).toBeLessThan(res.initialBalance);
+    expect(res.balanceTransferComparison).toBeDefined();
+    expect(res.balanceTransferComparison?.netSavings).toBeGreaterThan(0);
+  });
 });

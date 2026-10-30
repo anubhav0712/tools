@@ -43,4 +43,33 @@ describe('Retirement & FIRE Planner Engine', () => {
     expect(res.shortfallOrSurplus).toBeLessThan(0);
     expect(res.recommendedMonthlySaving).toBeGreaterThan(res.projectedCorpus / (5 * 12));
   });
+
+  it('reduces target required corpus when guaranteed post-retirement pension is present', () => {
+    const withoutPension = executeRetirementPlanner({
+      currentAge: 35,
+      retirementAge: 65,
+      lifeExpectancyYears: 85,
+      currentMonthlyExpense: 50000,
+      inflationRatePercent: 5,
+      preRetirementReturnRate: 10,
+      postRetirementReturnRate: 7,
+      currentSavings: 500000,
+      monthlyContribution: 20000,
+    });
+
+    const withPension = executeRetirementPlanner({
+      currentAge: 35,
+      retirementAge: 65,
+      lifeExpectancyYears: 85,
+      currentMonthlyExpense: 50000,
+      inflationRatePercent: 5,
+      preRetirementReturnRate: 10,
+      postRetirementReturnRate: 7,
+      currentSavings: 500000,
+      monthlyContribution: 20000,
+      postRetirementGuaranteedIncomeAnnual: 500000, // ₹5L annual pension
+    });
+
+    expect(withPension.netRequiredCorpusAfterPension).toBeLessThan(withoutPension.requiredCorpus);
+  });
 });

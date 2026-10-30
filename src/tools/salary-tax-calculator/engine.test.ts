@@ -15,6 +15,12 @@ describe('Salary & Take-Home Tax Calculator Engine', () => {
       expect(res.breakdown.incomeTax).toBe(0);
       expect(res.totalTaxAnnual).toBe(0);
       expect(res.annualTakeHome).toBe(750000 - 2400); // minus ₹2,400 prof tax
+
+      // Verify brackets reflect the Section 87A rebate so slab sum matches net income tax
+      const rebateBracket = res.brackets.find((b) => b.label.includes('87A'));
+      expect(rebateBracket).toBeDefined();
+      const sumOfBrackets = res.brackets.reduce((sum, b) => sum + b.taxOwed, 0);
+      expect(sumOfBrackets).toBe(0);
     });
 
     it('calculates tax accurately for ₹15 Lakhs under New Regime', () => {
@@ -56,6 +62,22 @@ describe('Salary & Take-Home Tax Calculator Engine', () => {
       expect(res.breakdown.additionalTaxOrCess).toBe(0);
       expect(res.totalTaxAnnual).toBe(120000);
     });
+
+    it('applies Section 87A Marginal Relief when income marginally exceeds ₹7.75 Lakhs', () => {
+      // Gross 7,85,000 - 75,000 std deduction = 7,10,000 taxable.
+      // Excess income over ₹7,00,000 is ₹10,000.
+      // Normal slab tax would be: 3-7L (20k) + 10k * 10% (1k) = 21,000.
+      // With Marginal Relief, tax cannot exceed excess income (₹10,000)!
+      const res = executeSalaryTax({
+        region: 'IN',
+        annualGrossSalary: 785000,
+        indiaRegime: 'new',
+        includeEpf: false,
+      });
+
+      expect(res.breakdown.incomeTax).toBe(10000); // capped at excess income!
+      expect(res.marginalReliefBenefit).toBe(11000); // saved ₹11,000
+    });
   });
 
   describe('US Federal & FICA Tax', () => {
@@ -79,6 +101,20 @@ describe('Salary & Take-Home Tax Calculator Engine', () => {
       expect(res.monthlyGross).toBe(8333);
       expect(res.annualTakeHome).toBe(100000 - (13841 + 7650));
       expect(res.effectiveTaxRatePercent).toBeGreaterThan(20);
+    });
+
+    it('applies Head of Household standard deduction and brackets correctly', () => {
+      const res = executeSalaryTax({
+        region: 'US',
+        annualGrossSalary: 85000,
+        usFilingStatus: 'head_of_household',
+        usStateTaxRate: 0,
+        usPreTaxDeductions: 0,
+      });
+
+      // Standard deduction for Head of Household is $21,900
+      expect(res.breakdown.standardDeduction).toBe(21900);
+      expect(res.breakdown.taxableIncome).toBe(85000 - 21900);
     });
   });
 });

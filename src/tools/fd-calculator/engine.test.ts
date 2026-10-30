@@ -50,4 +50,17 @@ describe('Fixed Deposit & CD Calculator Engine', () => {
     expect(res.estimatedTdsAmount).toBeGreaterThan(0);
     expect(res.postTaxMaturityAmount).toBe(res.maturityAmount - res.estimatedTdsAmount);
   });
+
+  it('calculates regular monthly interest payout for retirees', () => {
+    const res = executeFd({
+      depositAmount: 1200000,
+      annualInterestRate: 7.5,
+      tenureYears: 3,
+      payoutType: 'monthly_payout',
+    });
+
+    expect(res.periodicPayoutAmount).toBeGreaterThan(7000);
+    expect(res.maturityAmount).toBe(1200000); // principal preserved at maturity
+    expect(res.effectiveApy).toBeGreaterThan(7.5);
+  });
 });

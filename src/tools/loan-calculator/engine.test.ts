@@ -47,4 +47,31 @@ describe('Loan Calculator Engine', () => {
     expect(res.totalInterest).toBe(0);
     expect(res.totalPayment).toBe(0);
   });
+
+  it('computes TILA APR higher than note rate when origination fees are charged', () => {
+    const res = executeLoanCalculator({
+      principal: 400000,
+      annualInterestRate: 6.85,
+      tenureYears: 30,
+      originationFeePercent: 1.5, // 1.5% points/fees
+    });
+
+    expect(res.apr).toBeGreaterThan(6.85);
+    expect(res.totalFinanceCharges).toBeGreaterThan(res.totalInterest);
+  });
+
+  it('tracks PMI and terminates it when balance reaches 78% LTV under HPA rules', () => {
+    const res = executeLoanCalculator({
+      principal: 270000,
+      homeValue: 300000, // 90% LTV
+      annualInterestRate: 6.5,
+      tenureYears: 30,
+      pmiAnnualPercent: 0.85,
+    });
+
+    expect(res.loanToValueRatio).toBe(90);
+    expect(res.pmiMonthly).toBeGreaterThan(0);
+    expect(res.pmiMonthsRemaining).toBeGreaterThan(0);
+    expect(res.pmiMonthsRemaining).toBeLessThan(360); // Drops off before loan ends!
+  });
 });

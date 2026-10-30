@@ -109,7 +109,7 @@ export const SipCalculatorUI: React.FC<ToolComponentProps<SipCalculatorInput, Si
         setStepUp(0);
       }}
       executionTimeMs={executionTime}
-      inputData={{ monthlyInvestment: monthly, annualExpectedReturn: expectedReturn, investmentYears: years }}
+      inputData={{ monthlyInvestment: monthly, annualExpectedReturn: expectedReturn, investmentYears: years, annualStepUpPercent: stepUp }}
       documentation={documentationNode}
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

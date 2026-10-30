@@ -127,7 +127,14 @@ export const LoanCalculatorUI: React.FC<ToolComponentProps<LoanCalculatorInput, 
         setInsurance(0);
       }}
       executionTimeMs={executionTime}
-      inputData={{ principal, annualInterestRate: rate, tenureYears, extraMonthlyPayment: extraMonthly }}
+      inputData={{
+        principal,
+        annualInterestRate: rate,
+        tenureYears,
+        extraMonthlyPayment: extraMonthly,
+        propertyTaxAnnual: propertyTax,
+        insuranceAnnual: insurance,
+      }}
       documentation={documentationNode}
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

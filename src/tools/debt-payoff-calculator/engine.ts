@@ -1,3 +1,9 @@
+export interface BalanceTransferOffer {
+  promotionalAprPercent: number; // e.g. 0% APR
+  promotionalMonths: number;     // e.g. 15 or 18 months
+  transferFeePercent: number;    // e.g. 3% or 5%
+}
+
 export interface DebtPayoffInput {
   balance: number;
   annualInterestRate: number; // e.g. 24 for 24% APR
@@ -5,6 +11,8 @@ export interface DebtPayoffInput {
   extraMonthlyPayment?: number; // Extra snowball payment
   minimumPaymentPercentage?: number; // e.g. 3% minimum rule
   useMinimumPayment?: boolean;
+  // Enterprise fields
+  balanceTransferOffer?: BalanceTransferOffer;
 }
 
 export interface DebtPayoffMonth {
@@ -28,6 +36,14 @@ export interface DebtPayoffOutput {
     interestSaved: number;
   };
   schedule: DebtPayoffMonth[];
+  // Enterprise CARD Act Metrics
+  cardAct36MonthPayment?: number;
+  cardAct36MonthInterest?: number;
+  balanceTransferComparison?: {
+    upfrontTransferFee: number;
+    totalAmountWithTransfer: number;
+    netSavings: number;
+  };
 }
 
 function simulatePayoff(
@@ -35,6 +51,10 @@ function simulatePayoff(
   monthlyRate: number,
   payment: number
 ): { months: number; totalInterest: number; schedule: DebtPayoffMonth[]; isPayable: boolean } {
+  if (balance <= 0) {
+    return { months: 0, totalInterest: 0, schedule: [], isPayable: true };
+  }
+
   let currBalance = balance;
   let totalInterest = 0;
   const schedule: DebtPayoffMonth[] = [];
@@ -71,6 +91,22 @@ function simulatePayoff(
 
 export function executeDebtPayoff(input: DebtPayoffInput): DebtPayoffOutput {
   const balance = Math.max(0, input.balance || 0);
+  if (balance === 0) {
+    return {
+      initialBalance: 0,
+      monthlyPaymentUsed: 0,
+      totalInterestPaid: 0,
+      totalAmountPaid: 0,
+      monthsToPayoff: 0,
+      isPayable: true,
+      minimumPaymentTrapWarning: false,
+      savingsWithExtra: undefined,
+      schedule: [],
+      cardAct36MonthPayment: 0,
+      cardAct36MonthInterest: 0,
+    };
+  }
+
   const apr = Math.max(0, input.annualInterestRate || 0) / 100;
   const monthlyRate = apr / 12;
 
@@ -104,6 +140,39 @@ export function executeDebtPayoff(input: DebtPayoffInput): DebtPayoffOutput {
   const totalInterestPaid = isPayable ? activeSim.totalInterest : 0;
   const totalAmountPaid = isPayable ? Math.round(balance + totalInterestPaid) : 0;
 
+  // CARD Act 36-Month Amortization Calculation
+  let cardAct36MonthPayment = 0;
+  let cardAct36MonthInterest = 0;
+  if (monthlyRate > 0) {
+    cardAct36MonthPayment = Math.round(
+      (balance * (monthlyRate * Math.pow(1 + monthlyRate, 36))) /
+      (Math.pow(1 + monthlyRate, 36) - 1)
+    );
+    cardAct36MonthInterest = Math.max(0, Math.round(cardAct36MonthPayment * 36 - balance));
+  } else {
+    cardAct36MonthPayment = Math.round(balance / 36);
+  }
+
+  // Balance transfer evaluation if offer is configured
+  let balanceTransferComparison = undefined;
+  if (input.balanceTransferOffer) {
+    const feePercent = (input.balanceTransferOffer.transferFeePercent || 0) / 100;
+    const upfrontTransferFee = Math.round(balance * feePercent);
+    const newPrincipal = balance + upfrontTransferFee;
+    const promoMonthlyRate = (input.balanceTransferOffer.promotionalAprPercent || 0) / (12 * 100);
+
+    const transferSim = simulatePayoff(newPrincipal, promoMonthlyRate, totalPayment);
+    if (transferSim.isPayable) {
+      const totalAmountWithTransfer = Math.round(newPrincipal + transferSim.totalInterest);
+      const netSavings = Math.max(0, totalAmountPaid - totalAmountWithTransfer);
+      balanceTransferComparison = {
+        upfrontTransferFee,
+        totalAmountWithTransfer,
+        netSavings,
+      };
+    }
+  }
+
   return {
     initialBalance: Math.round(balance),
     monthlyPaymentUsed: Math.round(totalPayment),
@@ -114,5 +183,8 @@ export function executeDebtPayoff(input: DebtPayoffInput): DebtPayoffOutput {
     minimumPaymentTrapWarning: Boolean(input.useMinimumPayment || basePayment <= computedMinPayment * 1.1),
     savingsWithExtra,
     schedule: activeSim.schedule,
+    cardAct36MonthPayment,
+    cardAct36MonthInterest,
+    balanceTransferComparison,
   };
 }

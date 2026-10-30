@@ -1,8 +1,12 @@
+export type InflationBasketCategory = 'general_cpi' | 'education' | 'healthcare' | 'housing' | 'custom';
+
 export interface InflationInput {
   amount: number;
   annualInflationRate: number; // e.g. 6 for 6%
   years: number;
   mode?: 'future_cost' | 'purchasing_power';
+  // Enterprise fields
+  basketCategory?: InflationBasketCategory;
 }
 
 export interface InflationYearSchedule {
@@ -17,7 +21,10 @@ export interface InflationOutput {
   purchasingPowerValue: number;
   purchasingPowerLossPercent: number;
   cumulativeInflationPercent: number;
-  doublingYears: number; // Rule of 72
+  doublingYears: number; // Rule of 72 heuristic
+  // Enterprise Exact Metrics
+  exactDoublingYears: number; // ln(2) / ln(1 + r)
+  annualizedDecayRate: number;
   yearlySchedule: InflationYearSchedule[];
 }
 
@@ -40,8 +47,18 @@ export function executeInflation(input: InflationInput): InflationOutput {
 
   const cumulativeInflationPercent = Number(((Math.pow(1 + rate, years) - 1) * 100).toFixed(1));
 
-  // Rule of 72
+  // Rule of 72 heuristic
   const doublingYears = rate > 0 ? Number((72 / (rate * 100)).toFixed(1)) : 0;
+
+  // Exact logarithmic doubling time: ln(2) / ln(1 + rate)
+  const exactDoublingYears = rate > 0
+    ? Number((Math.log(2) / Math.log(1 + rate)).toFixed(2))
+    : 0;
+
+  // Annualized purchasing power decay rate: 1 - 1 / (1 + r)
+  const annualizedDecayRate = rate > 0
+    ? Number(((1 - 1 / (1 + rate)) * 100).toFixed(2))
+    : 0;
 
   const yearlySchedule: InflationYearSchedule[] = [];
   for (let yr = 1; yr <= years; yr++) {
@@ -65,6 +82,8 @@ export function executeInflation(input: InflationInput): InflationOutput {
     purchasingPowerLossPercent,
     cumulativeInflationPercent,
     doublingYears,
+    exactDoublingYears,
+    annualizedDecayRate,
     yearlySchedule,
   };
 }

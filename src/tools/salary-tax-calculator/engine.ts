@@ -1,7 +1,8 @@
 import type { RegionCode } from '../../core/locale';
 
 export type IndiaTaxRegime = 'new' | 'old';
-export type UsFilingStatus = 'single' | 'married';
+export type UsFilingStatus = 'single' | 'married' | 'head_of_household';
+export type PaycheckFrequency = 'annual' | 'monthly' | 'semimonthly' | 'biweekly' | 'weekly';
 
 export interface SalaryTaxInput {
   region: RegionCode;
@@ -11,11 +12,13 @@ export interface SalaryTaxInput {
   indiaDeductions80C?: number; // Old regime: max 1.5L
   indiaDeductions80D?: number; // Old regime: health insurance
   indiaHraDeduction?: number;  // Old regime: rent exemption
+  indiaNpsDeduction80Ccd?: number; // 80CCD(1B) / 80CCD(2)
   includeEpf?: boolean;        // Employee PF deduction
   // US specific
   usFilingStatus?: UsFilingStatus;
   usStateTaxRate?: number;     // e.g. 4.5% average or 0% for TX/FL
   usPreTaxDeductions?: number; // 401(k) / HSA / FSA
+  usPayFrequency?: PaycheckFrequency;
 
   // Advanced Overrides
   customStandardDeduction?: number;
@@ -58,6 +61,13 @@ export interface SalaryTaxOutput {
   };
 
   brackets: TaxBracketBreakdown[];
+
+  // Enterprise Compliance Metrics
+  marginalReliefBenefit?: number; // Section 87A Marginal Relief in India
+  perPaycheckTakeHome?: number;
+  ficaSocialSecurityTax?: number;
+  ficaMedicareTax?: number;
+  stateTaxAnnual?: number;
 }
 
 // ---------------- INDIA TAX CALCULATION ----------------
@@ -75,13 +85,15 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
     const d80c = Math.min(150000, Math.max(0, input.indiaDeductions80C || 0));
     const d80d = Math.min(50000, Math.max(0, input.indiaDeductions80D || 0));
     const hra = Math.max(0, input.indiaHraDeduction || 0);
-    otherDeductions = d80c + d80d + hra;
+    const nps = Math.min(50000, Math.max(0, input.indiaNpsDeduction80Ccd || 0));
+    otherDeductions = d80c + d80d + hra + nps;
   }
 
   const taxableIncome = Math.max(0, gross - standardDeduction - otherDeductions);
   const brackets: TaxBracketBreakdown[] = [];
   let baseTax = 0;
   let marginalRate = 0;
+  let marginalReliefBenefit = 0;
 
   if (regime === 'new') {
     // New Slabs FY 2024-25 / 2025-26
@@ -111,13 +123,35 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
       }
     }
 
-    // Rebate u/s 87A: If taxable income <= ceiling, tax is zero
     const rebateCeiling = input.customSection87aCeiling !== undefined
       ? input.customSection87aCeiling
       : 700000;
 
     if (taxableIncome <= rebateCeiling) {
+      // Full rebate under 87A
+      if (baseTax > 0) {
+        brackets.push({
+          label: 'Section 87A Tax Rebate (Full Exemption)',
+          rate: 0,
+          taxableAmount: Math.round(taxableIncome),
+          taxOwed: -Math.round(baseTax),
+        });
+      }
       baseTax = 0;
+    } else {
+      // Proviso to Section 87A: Marginal Relief
+      // Tax payable cannot exceed the amount by which taxable income exceeds ₹7,00,000
+      const excessIncome = taxableIncome - rebateCeiling;
+      if (baseTax > excessIncome) {
+        marginalReliefBenefit = Math.round(baseTax - excessIncome);
+        baseTax = excessIncome;
+        brackets.push({
+          label: 'Section 87A Marginal Relief Protection',
+          rate: 0,
+          taxableAmount: Math.round(taxableIncome),
+          taxOwed: -marginalReliefBenefit,
+        });
+      }
     }
   } else {
     // Old Slabs
@@ -150,6 +184,14 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
       : 500000;
 
     if (taxableIncome <= rebateCeiling) {
+      if (baseTax > 0) {
+        brackets.push({
+          label: 'Section 87A Tax Rebate (Full Exemption)',
+          rate: 0,
+          taxableAmount: Math.round(taxableIncome),
+          taxOwed: -Math.round(baseTax),
+        });
+      }
       baseTax = 0;
     }
   }
@@ -194,6 +236,7 @@ function calculateIndiaTax(input: SalaryTaxInput): SalaryTaxOutput {
       taxableIncome: Math.round(taxableIncome),
     },
     brackets,
+    marginalReliefBenefit,
   };
 }
 
@@ -204,8 +247,11 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
   const preTaxDeductions = Math.max(0, input.usPreTaxDeductions || 0); // 401(k)
   const stateRate = Math.max(0, input.usStateTaxRate ?? 4.5) / 100;
 
-  // Standard deduction 2024 (Single $14,600, Married $29,200)
-  const defaultStdDeduction = status === 'married' ? 29200 : 14600;
+  // Standard deduction 2024 (Single $14,600, Married $29,200, Head of Household $21,900)
+  let defaultStdDeduction = 14600;
+  if (status === 'married') defaultStdDeduction = 29200;
+  else if (status === 'head_of_household') defaultStdDeduction = 21900;
+
   const standardDeduction = input.customStandardDeduction !== undefined
     ? Math.max(0, input.customStandardDeduction)
     : defaultStdDeduction;
@@ -232,7 +278,20 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
     { max: Infinity, rate: 0.37, label: 'Over $731,200 (37%)' },
   ];
 
-  const slabs = status === 'married' ? marriedSlabs : singleSlabs;
+  const headOfHouseholdSlabs = [
+    { max: 16550, rate: 0.10, label: 'Up to $16,550 (10%)' },
+    { max: 63100, rate: 0.12, label: '$16,550 - $63,100 (12%)' },
+    { max: 100500, rate: 0.22, label: '$63,100 - $100,500 (22%)' },
+    { max: 191950, rate: 0.24, label: '$100,500 - $191,950 (24%)' },
+    { max: 243700, rate: 0.32, label: '$191,950 - $243,700 (32%)' },
+    { max: 609350, rate: 0.35, label: '$243,700 - $609,350 (35%)' },
+    { max: Infinity, rate: 0.37, label: 'Over $609,350 (37%)' },
+  ];
+
+  let slabs = singleSlabs;
+  if (status === 'married') slabs = marriedSlabs;
+  else if (status === 'head_of_household') slabs = headOfHouseholdSlabs;
+
   const brackets: TaxBracketBreakdown[] = [];
   let federalTax = 0;
   let marginalRate = 0;
@@ -277,6 +336,13 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
   const monthlyTakeHome = Math.round(annualTakeHome / 12);
   const biweeklyTakeHome = Math.round(annualTakeHome / 26);
 
+  // Paycheck breakdown according to specified frequency
+  let perPaycheckTakeHome = biweeklyTakeHome;
+  if (input.usPayFrequency === 'weekly') perPaycheckTakeHome = Math.round(annualTakeHome / 52);
+  else if (input.usPayFrequency === 'semimonthly') perPaycheckTakeHome = Math.round(annualTakeHome / 24);
+  else if (input.usPayFrequency === 'monthly') perPaycheckTakeHome = monthlyTakeHome;
+  else if (input.usPayFrequency === 'annual') perPaycheckTakeHome = annualTakeHome;
+
   const effectiveTaxRate = gross > 0 ? (totalTaxes / gross) * 100 : 0;
 
   return {
@@ -298,6 +364,10 @@ function calculateUsTax(input: SalaryTaxInput): SalaryTaxOutput {
       taxableIncome: Math.round(taxableIncome),
     },
     brackets,
+    perPaycheckTakeHome,
+    ficaSocialSecurityTax: Math.round(socialSecurityTax),
+    ficaMedicareTax: Math.round(totalMedicare),
+    stateTaxAnnual: Math.round(stateTax),
   };
 }
 

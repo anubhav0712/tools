@@ -48,4 +48,18 @@ describe('Compound Interest Calculator Engine', () => {
     expect(res.finalBalance).toBe(0);
     expect(res.totalInterest).toBe(0);
   });
+
+  it('calculates Truth in Savings APY and exact doubling period', () => {
+    const res = executeCompoundInterest({
+      initialPrincipal: 10000,
+      annualInterestRate: 6,
+      investmentYears: 5,
+      compoundingFrequency: 'monthly',
+    });
+
+    expect(res.apyPercent).toBeGreaterThan(6.0);
+    expect(res.apyPercent).toBeLessThan(6.2);
+    expect(res.exactDoublingYears).toBeGreaterThan(11);
+    expect(res.exactDoublingYears).toBeLessThan(12);
+  });
 });

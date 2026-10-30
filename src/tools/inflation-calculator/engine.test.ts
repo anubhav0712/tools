@@ -27,4 +27,17 @@ describe('Inflation & Purchasing Power Calculator Engine', () => {
     expect(res.purchasingPowerValue).toBe(50000);
     expect(res.purchasingPowerLossPercent).toBe(0);
   });
+
+  it('calculates exact logarithmic doubling time vs Rule of 72 heuristic', () => {
+    const res = executeInflation({
+      amount: 100000,
+      annualInflationRate: 8,
+      years: 10,
+    });
+
+    expect(res.doublingYears).toBe(9); // 72 / 8 = 9
+    expect(res.exactDoublingYears).toBeGreaterThan(8.9);
+    expect(res.exactDoublingYears).toBeLessThan(9.1);
+    expect(res.annualizedDecayRate).toBeGreaterThan(7.0);
+  });
 });

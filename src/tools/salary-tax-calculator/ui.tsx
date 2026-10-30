@@ -168,7 +168,7 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
           </div>
 
           <div className="flex flex-col gap-2">
-            <h4 className="font-bold text-slate-900">3. statutory Deductions</h4>
+            <h4 className="font-bold text-slate-900">3. Statutory Deductions</h4>
             <p className="text-xs text-slate-600">
               - <strong>Employee Provident Fund (EPF):</strong> 12% of basic salary goes into your government-backed EPF retirement account earning ~8.25% tax-free interest.<br />
               - <strong>Health & Education Cess:</strong> 4% added to the calculated income tax.<br />
@@ -407,11 +407,10 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
                   <button
                     type="button"
                     onClick={() => setIndiaRegime('new')}
-                    className={`text-xs p-3 rounded-xl border flex flex-col gap-1 text-left transition cursor-pointer ${
-                      indiaRegime === 'new'
+                    className={`text-xs p-3 rounded-xl border flex flex-col gap-1 text-left transition cursor-pointer ${indiaRegime === 'new'
                         ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 font-semibold shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center justify-between">
                       <span>New Tax Regime</span>
@@ -425,11 +424,10 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
                   <button
                     type="button"
                     onClick={() => setIndiaRegime('old')}
-                    className={`text-xs p-3 rounded-xl border flex flex-col gap-1 text-left transition cursor-pointer ${
-                      indiaRegime === 'old'
+                    className={`text-xs p-3 rounded-xl border flex flex-col gap-1 text-left transition cursor-pointer ${indiaRegime === 'old'
                         ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 font-semibold shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center justify-between">
                       <span>Old Tax Regime</span>
@@ -502,11 +500,10 @@ export const SalaryTaxUI: React.FC<ToolComponentProps<SalaryTaxInput, SalaryTaxO
                       key={status}
                       type="button"
                       onClick={() => setFilingStatus(status)}
-                      className={`text-xs py-2.5 px-3 rounded-xl border font-medium capitalize transition cursor-pointer ${
-                        filingStatus === status
+                      className={`text-xs py-2.5 px-3 rounded-xl border font-medium capitalize transition cursor-pointer ${filingStatus === status
                           ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       {status === 'married' ? 'Married (Filing Jointly)' : 'Single'}
                     </button>

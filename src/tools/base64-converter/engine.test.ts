@@ -36,6 +36,16 @@ describe('Base64 Converter Engine', () => {
     expect(decoded.result).toBe(text);
   });
 
+  it('correctly decodes multiline or wrapped URL-safe Base64 with whitespace', () => {
+    const text = 'subjects?_d=1&test=true';
+    const encoded = executeBase64Converter({ text, mode: 'encode', urlSafe: true }).result;
+    const multiline = `${encoded.slice(0, 10)}\n${encoded.slice(10)}`;
+
+    const decoded = executeBase64Converter({ text: multiline, mode: 'decode', urlSafe: true });
+    expect(decoded.isValid).toBe(true);
+    expect(decoded.result).toBe(text);
+  });
+
   it('reports errors for corrupted Base64 in decode mode', () => {
     const res = executeBase64Converter({ text: '!!!NotValidBase64@@@', mode: 'decode', urlSafe: false });
     expect(res.isValid).toBe(false);

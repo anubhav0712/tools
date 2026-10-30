@@ -61,4 +61,11 @@ describe('JSON Formatter Engine', () => {
     expect(result.formatted).toBe('');
     expect(result.byteSize).toBe(0);
   });
+
+  it('handles undefined or missing rawJson without crashing', () => {
+    const result = executeJsonFormatter({} as any);
+    expect(result.isValid).toBe(true);
+    expect(result.formatted).toBe('');
+    expect(result.byteSize).toBe(0);
+  });
 });

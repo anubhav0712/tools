@@ -28,4 +28,14 @@ describe('Text Analyzer Engine', () => {
     expect(res.words).toBe(9);
     expect(res.readingTimeMinutes).toBeGreaterThan(0);
   });
+
+  it('correctly counts sentences even when the final sentence lacks a period', () => {
+    const res = executeTextAnalyzer({ text: 'First sentence. Second sentence' });
+    expect(res.sentences).toBe(2);
+  });
+
+  it('correctly counts sentences with multiple exclamation and question marks', () => {
+    const res = executeTextAnalyzer({ text: 'Hello! How are you?! I am doing great...' });
+    expect(res.sentences).toBe(3);
+  });
 });

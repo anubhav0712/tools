@@ -5,6 +5,7 @@ import { generateMcpManifest } from './core/mcp-generator';
 import { Header } from './shell/header';
 import { CatalogGrid } from './shell/catalog-grid';
 import { CommandPalette } from './shell/command-palette';
+import { AgentConnectModal } from './shell/agent-connect-modal';
 // Import tools to ensure they are registered
 import './tools';
 
@@ -12,6 +13,7 @@ export const App: React.FC = () => {
   const [activeToolId, setActiveToolId] = useState<string | null>(null);
   const [initialInput, setInitialInput] = useState<unknown>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAgentConnectOpen, setIsAgentConnectOpen] = useState(false);
 
   // Synchronize state with URL hash
   useEffect(() => {
@@ -60,6 +62,7 @@ export const App: React.FC = () => {
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
         onHomeClick={handleHomeClick}
+        onOpenAgentConnect={() => setIsAgentConnectOpen(true)}
         currentToolName={activeTool?.metadata.name}
       />
 
@@ -86,6 +89,13 @@ export const App: React.FC = () => {
         onSelectTool={handleSelectTool}
       />
 
+      {/* Agent Connect Modal */}
+      <AgentConnectModal
+        isOpen={isAgentConnectOpen}
+        onClose={() => setIsAgentConnectOpen(false)}
+        tools={allTools}
+      />
+
       {/* Global Footer */}
       <footer className="w-full border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -93,6 +103,14 @@ export const App: React.FC = () => {
             Tools Suite — 100% Client-Side Execution. Zero cloud servers. Total data privacy.
           </p>
           <div className="flex items-center gap-4 text-slate-400">
+            <button
+              type="button"
+              onClick={() => setIsAgentConnectOpen(true)}
+              className="hover:text-purple-400 transition-colors"
+            >
+              Connect to AI Agent
+            </button>
+            <span>•</span>
             <button
               type="button"
               onClick={() => {

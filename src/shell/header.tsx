@@ -1,15 +1,18 @@
 import React from 'react';
-import { Wrench, ShieldCheck, Search, Github } from 'lucide-react';
+import { Wrench, ShieldCheck, Search, Github, Bot } from 'lucide-react';
+import { Button } from '../design-system/button';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
   onHomeClick: () => void;
+  onOpenAgentConnect: () => void;
   currentToolName?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
   onHomeClick,
+  onOpenAgentConnect,
   currentToolName,
 }) => {
   return (
@@ -63,7 +66,19 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <Button
+            variant="agent"
+            size="sm"
+            onClick={onOpenAgentConnect}
+            className="text-xs h-8 px-2.5 gap-1.5 shadow-sm"
+            title="Connect tools to Claude, Cursor, or AI agents via MCP"
+          >
+            <Bot className="w-3.5 h-3.5 text-purple-300" />
+            <span className="hidden sm:inline">Use with AI Agent</span>
+            <span className="sm:hidden">Agent</span>
+          </Button>
+
           <button
             type="button"
             onClick={onOpenSearch}
@@ -75,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/40 text-[11px] font-medium text-emerald-400">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Zero Cloud • 100% Client-Side</span>
+            <span>Zero Cloud</span>
           </div>
 
           <a

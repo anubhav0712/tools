@@ -34,7 +34,7 @@ export const AgentConnectModal: React.FC<AgentConnectModalProps> = ({
       mcpServers: {
         'tools-suite': {
           command: 'npx',
-          args: ['-y', 'tools-mcp'],
+          args: ['-y', '@anubhav0712/tools-mcp'],
         },
       },
     },
@@ -47,13 +47,13 @@ export const AgentConnectModal: React.FC<AgentConnectModalProps> = ({
       name: 'tools-suite',
       type: 'stdio',
       command: 'npx',
-      args: ['-y', 'tools-mcp'],
+      args: ['-y', '@anubhav0712/tools-mcp'],
     },
     null,
     2
   );
 
-  const npxCommand = 'npx -y tools-mcp';
+  const npxCommand = 'npx -y @anubhav0712/tools-mcp';
 
   const getCopyContent = () => {
     if (activeTab === 'claude') return claudeConfig;

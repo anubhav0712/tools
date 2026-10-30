@@ -153,11 +153,36 @@ tools/
 
 ---
 
-## Deployment to GitHub Pages
+## CI/CD & Deployment Workflows
 
-1. In your GitHub repository, navigate to **Settings > Pages**.
-2. Under **Build and deployment > Source**, select **GitHub Actions**.
-3. Push to `main`. The `.github/workflows/deploy.yml` pipeline will automatically build the static site, export `/mcp-manifest.json`, and publish to GitHub Pages.
+This repository features two fully automated GitHub Actions workflows:
+
+### 1. Website Deployment (`.github/workflows/deploy.yml`)
+- **Trigger**: Every push to `main`.
+- **What it does**: Runs all 13+ unit tests, builds the static website with relative asset paths, and deploys to **GitHub Pages** (`https://anubhav0712.github.io/tools/`).
+- **One-time Setup**: In your GitHub repo, go to **Settings > Pages** and set **Source** to **GitHub Actions**.
+
+### 2. NPM / NPX Package Publishing (`.github/workflows/publish-npm.yml`)
+- **Trigger**: Push to `main` (when version changes) or manual workflow dispatch.
+- **What it does**: Inspects `@anubhav0712/tools-mcp` version. If it's a new version, automatically bundles the standalone zero-dependency executable (`bin/tools-mcp.cjs`) and publishes to npm with supply-chain provenance.
+- **One-time Setup**: Add your `NPM_TOKEN` secret in **Settings > Secrets and variables > Actions**.
+
+---
+
+## Running with AI Agents via NPX
+
+Once published, anyone can connect all tools to **Claude Desktop**, **Cursor**, or custom agents:
+
+```json
+{
+  "mcpServers": {
+    "tools": {
+      "command": "npx",
+      "args": ["-y", "@anubhav0712/tools-mcp"]
+    }
+  }
+}
+```
 
 ---
 

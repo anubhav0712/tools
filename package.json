@@ -1,8 +1,15 @@
 {
-  "name": "tools",
-  "private": true,
+  "name": "@anubhav0712/tools-mcp",
   "version": "0.1.0",
+  "description": "100% In-Browser & Local-First Utility Tools with Stdio MCP Server for AI Agents",
   "type": "module",
+  "author": "anubhav0712",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anubhav0712/tools.git"
+  },
+  "homepage": "https://anubhav0712.github.io/tools/",
   "scripts": {
     "dev": "vite",
     "build": "npm run export-mcp && npm run build:cli && npm run build:web",
@@ -23,6 +30,9 @@
     "public/mcp-manifest.json",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",

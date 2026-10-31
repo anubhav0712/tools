@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && tsx scripts/generate-ssg.ts",
+    "ssg": "tsx scripts/generate-ssg.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

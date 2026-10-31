@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Wrench, Search, Github, ChevronDown, Check } from 'lucide-react';
 import { useRegion } from '../core/locale-context';
 import { REGIONS, RegionCode } from '../core/locale';
+import { getBaseBasePath } from '../core/url-state';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
@@ -36,9 +37,14 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand / Logo */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onHomeClick}
+          <a
+            href={getBaseBasePath()}
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                onHomeClick();
+              }
+            }}
             className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1 cursor-pointer"
           >
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
@@ -47,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="font-bold text-base tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
               Tools
             </span>
-          </button>
+          </a>
 
           {currentToolName && (
             <div className="hidden md:flex items-center gap-2 text-slate-400 text-sm">

@@ -56,6 +56,7 @@ export interface ToolMetadata {
   keywords: string[];
   version: string;
   icon: string;             // Lucide icon identifier
+  persistableInUrl?: boolean; // Set false for sensitive tools (JWT, passwords, etc.) to prevent URL leaks
   // Enterprise fields
   regulatoryStandards?: string[];
   supportedRegions?: ('IN' | 'US' | 'GLOBAL')[];

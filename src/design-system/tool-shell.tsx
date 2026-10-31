@@ -14,11 +14,14 @@ import {
 import { Button } from './button';
 import { Badge } from './badge';
 import type { ToolDefinition } from '../core/types';
+import { ToolSeoSection } from './tool-seo-section';
+import { getToolUrl, getBaseBasePath } from '../core/url-state';
 
 export interface ToolShellProps {
   tool: ToolDefinition;
   onBack?: () => void;
   onReset?: () => void;
+  onSelectTool?: (toolId: string) => void;
   executionTimeMs?: number;
   inputData?: unknown;
   documentation?: React.ReactNode;
@@ -30,6 +33,7 @@ export const ToolShell: React.FC<ToolShellProps> = ({
   tool,
   onBack,
   onReset,
+  onSelectTool,
   executionTimeMs,
   inputData,
   documentation,
@@ -45,20 +49,24 @@ export const ToolShell: React.FC<ToolShellProps> = ({
     if (onBack) {
       onBack();
     } else {
-      window.history.pushState(null, '', window.location.pathname);
+      window.history.pushState(null, '', getBaseBasePath());
       window.dispatchEvent(new PopStateEvent('popstate'));
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
   };
 
+  const isPrivateTool = tool.metadata.persistableInUrl === false;
+
   const generateShareableUrl = (): string => {
     const origin = window.location.origin;
-    const path = window.location.pathname;
+    const toolUrl = getToolUrl(tool.metadata.id);
+    if (isPrivateTool) {
+      return `${origin}${toolUrl}`;
+    }
     if (inputData !== undefined && inputData !== null) {
       const serialized = encodeURIComponent(JSON.stringify(inputData));
-      return `${origin}${path}#tool=${tool.metadata.id}&input=${serialized}`;
+      return `${origin}${toolUrl}?input=${serialized}`;
     }
-    return `${origin}${path}#tool=${tool.metadata.id}`;
+    return `${origin}${toolUrl}`;
   };
 
   const handleShareUrl = async () => {
@@ -234,6 +242,9 @@ export const ToolShell: React.FC<ToolShellProps> = ({
         </div>
       </div>
 
+      {/* Rich E-E-A-T Content, FAQs & Topical Silo Section */}
+      <ToolSeoSection tool={tool} onSelectTool={onSelectTool} />
+
       {/* Share Link Modal */}
       {isShareModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
@@ -252,12 +263,18 @@ export const ToolShell: React.FC<ToolShellProps> = ({
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-900 flex flex-col gap-1 leading-relaxed">
-              <span className="font-semibold text-amber-950">
-                Notice: Plain-Text Parameters
+            <div className={`p-3.5 rounded-2xl border text-xs flex flex-col gap-1 leading-relaxed ${
+              isPrivateTool
+                ? 'bg-emerald-50/90 border-emerald-200 text-emerald-900'
+                : 'bg-amber-50/90 border-amber-200 text-amber-900'
+            }`}>
+              <span className={`font-semibold ${isPrivateTool ? 'text-emerald-950' : 'text-amber-950'}`}>
+                {isPrivateTool ? '🔒 Zero-Egress Privacy Enforced' : 'Notice: Plain-Text Parameters'}
               </span>
               <p>
-                Inputs and calculation values in this link are serialized in plain text within the URL. Anyone with this link can view the numbers you entered. Do not share generated links if they contain sensitive or confidential financial data.
+                {isPrivateTool
+                  ? 'This tool handles sensitive credentials or private data. To prevent data leakage, your inputs are strictly excluded from the URL link. The recipient will open a clean, private workspace.'
+                  : 'Inputs and calculation values in this link are serialized in plain text within the URL. Anyone with this link can view the numbers you entered. Do not share generated links if they contain sensitive or confidential financial data.'}
               </p>
             </div>
 

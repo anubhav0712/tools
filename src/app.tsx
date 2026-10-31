@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { registry } from './core/registry';
 import { parseUrlState, setUrlTool } from './core/url-state';
+import { TOOL_SEO_DATA } from './core/seo-data';
 import { Header } from './shell/header';
 import { CatalogGrid } from './shell/catalog-grid';
 import { CommandPalette } from './shell/command-palette';
@@ -14,10 +15,11 @@ export const App: React.FC = () => {
   const [initialInput, setInitialInput] = useState<unknown>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Synchronize state with URL hash & history navigation
+  // Synchronize state with URL path, query params, hash & history navigation
   useEffect(() => {
+    const allToolIds = registry.getAll().map((t) => t.metadata.id);
     const handleNavigation = () => {
-      const { toolId, initialInput: input } = parseUrlState();
+      const { toolId, initialInput: input } = parseUrlState(allToolIds);
       setActiveToolId(toolId || null);
       setInitialInput(input);
     };
@@ -60,6 +62,27 @@ export const App: React.FC = () => {
 
   const activeTool = activeToolId ? registry.get(activeToolId) : undefined;
   const allTools = registry.getAll();
+
+  // Dynamic Browser Title and Meta Description for SPA transitions
+  useEffect(() => {
+    if (activeTool) {
+      const seoConfig = TOOL_SEO_DATA[activeTool.metadata.id];
+      document.title = seoConfig?.metaTitle || `${activeTool.metadata.name} — 100% In-Browser & Free | Tools`;
+      const descEl = document.querySelector('meta[name="description"]');
+      if (descEl) {
+        descEl.setAttribute('content', seoConfig?.metaDescription || activeTool.metadata.description);
+      }
+    } else {
+      document.title = 'Tools — 100% In-Browser, Private & Free Online Utilities';
+      const descEl = document.querySelector('meta[name="description"]');
+      if (descEl) {
+        descEl.setAttribute(
+          'content',
+          'Fast, minimal, and completely private online tools. Runs 100% inside your browser with zero data uploaded to the cloud.'
+        );
+      }
+    }
+  }, [activeTool]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">

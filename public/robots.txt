@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anubhav0712.github.io/tools/sitemap.xml

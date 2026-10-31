@@ -19,8 +19,27 @@ import {
   ShieldAlert,
   Flame,
   Percent,
+  KeyRound,
+  GitCompare,
+  Key,
+  Camera,
+  Files,
+  Clock,
+  FileSpreadsheet,
+  SearchCode,
+  Database,
+  Hash,
+  Link2,
+  QrCode,
+  Minimize2,
+  Palette,
+  Sparkles,
+  Type,
+  ListFilter,
+  BookOpen,
 } from 'lucide-react';
 import type { ToolDefinition } from '../core/types';
+import { getToolUrl } from '../core/url-state';
 
 export interface CatalogGridProps {
   tools: ToolDefinition[];
@@ -42,6 +61,24 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Flame,
   Percent,
   Wrench,
+  KeyRound,
+  GitCompare,
+  Key,
+  Camera,
+  Files,
+  Clock,
+  FileSpreadsheet,
+  SearchCode,
+  Database,
+  Hash,
+  Link2,
+  QrCode,
+  Minimize2,
+  Palette,
+  Sparkles,
+  Type,
+  ListFilter,
+  BookOpen,
 };
 
 function getToolIcon(iconName: string): React.ComponentType<{ className?: string }> {
@@ -54,10 +91,13 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
 
   const categories: Array<{ id: string; label: string }> = [
     { id: 'all', label: 'All Tools' },
-    { id: 'finance', label: 'Finance & Calculators' },
-    { id: 'text', label: 'Text & Writing' },
-    { id: 'converter', label: 'Converters' },
     { id: 'developer', label: 'Developer & Data' },
+    { id: 'crypto', label: 'Security & Privacy' },
+    { id: 'converter', label: 'Converters' },
+    { id: 'visual', label: 'Media & Visual' },
+    { id: 'text', label: 'Text & Writing' },
+    { id: 'finance', label: 'Finance & Calculators' },
+    { id: 'everyday', label: 'Everyday Utilities' },
   ];
 
   const filteredTools = tools.filter((tool) => {
@@ -142,13 +182,11 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filteredTools.map((tool) => (
-            <div
+            <a
               key={tool.metadata.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => onSelectTool(tool.metadata.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+              href={getToolUrl(tool.metadata.id)}
+              onClick={(e) => {
+                if (!e.metaKey && !e.ctrlKey) {
                   e.preventDefault();
                   onSelectTool(tool.metadata.id);
                 }
@@ -184,7 +222,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ tools, onSelectTool })
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       )}

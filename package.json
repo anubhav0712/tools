@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "check-reviews": "tsx scripts/check-review-schedule.ts",
+    "verify:change": "tsx scripts/verify-product-change.ts",
     "new-tool": "tsx scripts/new-tool.ts"
   },
   "dependencies": {

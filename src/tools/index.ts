@@ -30,6 +30,9 @@ import { qrCodeTool } from './qr-code-tool/definition';
 import { exifScrubberTool } from './exif-scrubber/definition';
 import { imageCompressorTool } from './image-compressor/definition';
 import { pdfManipulatorTool } from './pdf-manipulator/definition';
+import { kaveriPhotoResizerTool } from './kaveri-photo-resizer/definition';
+import { photoRedactorTool } from './photo-redactor/definition';
+import { passportPhotoGridTool } from './passport-photo-grid/definition';
 
 // Finance Suite
 import { loanCalculatorTool } from './loan-calculator/definition';
@@ -65,6 +68,9 @@ registry.register(qrCodeTool);
 registry.register(exifScrubberTool);
 registry.register(imageCompressorTool);
 registry.register(pdfManipulatorTool);
+registry.register(kaveriPhotoResizerTool);
+registry.register(photoRedactorTool);
+registry.register(passportPhotoGridTool);
 
 registry.register(loanCalculatorTool);
 registry.register(sipCalculatorTool);
@@ -100,6 +106,9 @@ export {
   exifScrubberTool,
   imageCompressorTool,
   pdfManipulatorTool,
+  kaveriPhotoResizerTool,
+  photoRedactorTool,
+  passportPhotoGridTool,
   loanCalculatorTool,
   sipCalculatorTool,
   compoundInterestCalculatorTool,

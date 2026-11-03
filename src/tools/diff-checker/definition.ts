@@ -45,6 +45,14 @@ export const diffCheckerTool: ToolDefinition<DiffCheckerInput, DiffCheckerOutput
     version: '1.0.0',
     icon: 'GitCompare',
     persistableInUrl: false, // Ensure private code snippets do not leak in URL
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Myers 1986 O(ND) Difference Algorithm / POSIX diff',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Myers Longest Common Subsequence (LCS) algorithm is mathematically proven and invariant.',
+    },
   },
   examples: [
     {

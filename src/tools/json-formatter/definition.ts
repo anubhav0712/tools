@@ -25,6 +25,14 @@ export const jsonFormatterTool: ToolDefinition<JsonFormatterInput, JsonFormatter
     keywords: ['json', 'format', 'minify', 'prettify', 'validate', 'sort keys', 'beautify'],
     version: '1.0.0',
     icon: 'Braces',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'IETF RFC 8259 / ECMA-404 The JSON Data Interchange Standard',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'JSON syntax specification is fixed.',
+    },
   },
   examples: [
     {

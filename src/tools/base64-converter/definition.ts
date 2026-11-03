@@ -24,6 +24,14 @@ export const base64ConverterTool: ToolDefinition<Base64ConverterInput, Base64Con
     keywords: ['base64', 'encode', 'decode', 'b64', 'urlsafe', 'ascii', 'utf8'],
     version: '1.0.0',
     icon: 'Binary',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'IETF RFC 4648 (The Base16, Base32, and Base64 Data Encodings)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Base64 alphabet and byte framing are immutable.',
+    },
   },
   examples: [
     {

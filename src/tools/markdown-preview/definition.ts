@@ -33,6 +33,16 @@ export const markdownPreviewTool: ToolDefinition<
     keywords: ['markdown', 'preview', 'gfm', 'html', 'docs', 'editor', 'notes', 'text'],
     version: '1.0.0',
     icon: 'BookOpen',
+    reviewPolicy: {
+      cadence: 'standards-track',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'GitHub Flavored Markdown (GFM) Spec / CommonMark',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-10-31',
+      reviewTrigger: 'CommonMark / GFM specification updates',
+      changeRisk: 'low',
+      notes: 'Review when major GFM spec additions or extensions are standardized.',
+    },
   },
   examples: [
     {

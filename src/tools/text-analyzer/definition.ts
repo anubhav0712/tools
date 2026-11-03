@@ -25,6 +25,14 @@ export const textAnalyzerTool: ToolDefinition<TextAnalyzerInput, TextAnalyzerOut
     keywords: ['word counter', 'character count', 'words', 'reading time', 'text', 'essay', 'characters'],
     version: '1.0.0',
     icon: 'FileText',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Unicode Standard Annex #29 (Unicode Text Segmentation)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Word and character counting algorithms are deterministic.',
+    },
   },
   examples: [
     {

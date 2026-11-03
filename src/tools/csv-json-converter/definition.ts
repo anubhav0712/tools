@@ -39,6 +39,14 @@ export const csvJsonConverterTool: ToolDefinition<
     keywords: ['csv', 'json', 'table', 'markdown', 'excel', 'convert', 'anonymize', 'data'],
     version: '1.0.0',
     icon: 'FileSpreadsheet',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'IETF RFC 4180 (CSV) / RFC 8259 (JSON)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'RFC 4180 comma-separated value grammar and RFC 8259 JSON grammar are finalized.',
+    },
   },
   examples: [
     {

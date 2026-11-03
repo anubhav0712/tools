@@ -37,6 +37,14 @@ export const regexTesterTool: ToolDefinition<RegexTesterInput, RegexTesterOutput
     keywords: ['regex', 'regexp', 'regular expression', 'test', 'pattern', 'match', 'developer'],
     version: '1.0.0',
     icon: 'SearchCode',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'ECMA-262 ECMAScript Regular Expression Specification',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Delegates to JavaScript standard RegExp engine; specification changes follow browser engine updates.',
+    },
   },
   examples: [
     {

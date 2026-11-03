@@ -11,6 +11,16 @@ export const fdCalculatorTool: ToolDefinition<FdInput, FdOutput> = {
     keywords: ['fd', 'fixed deposit', 'cd', 'certificate of deposit', 'term deposit', 'senior citizen', 'tds', 'bank interest', 'rbi', 'pension'],
     version: '1.1.0',
     icon: 'PiggyBank',
+    reviewPolicy: {
+      cadence: 'annual',
+      regulatoryCategory: 'tax-law',
+      governingBodyOrStandard: 'Income Tax Act 1961 Section 194A (TDS Thresholds) & RBI Master Directions',
+      lastReviewedDate: '2026-09-01',
+      nextReviewDate: '2027-04-01',
+      reviewTrigger: 'Annual Finance Bill adjustments to TDS thresholds and senior citizen limits',
+      changeRisk: 'medium',
+      notes: 'Quarterly compounding formula is invariant, but TDS threshold limits (₹40,000 / ₹50,000) and tax rates are statutory.',
+    },
     regulatoryStandards: [
       'Reserve Bank of India (RBI) Master Direction - Interest Rates on Deposits',
       'Income Tax Act 1961 Section 194A (TDS Thresholds ₹40k/₹50k)',

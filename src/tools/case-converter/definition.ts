@@ -28,6 +28,14 @@ export const caseConverterTool: ToolDefinition<CaseConverterInput, CaseConverter
     keywords: ['case', 'converter', 'camelcase', 'snake_case', 'slug', 'pascalcase', 'text'],
     version: '1.0.0',
     icon: 'Type',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Unicode Standard Case Mapping (Unicode Consortium)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Case transformations and diacritic normalization follow Unicode standard rules.',
+    },
   },
   examples: [
     {

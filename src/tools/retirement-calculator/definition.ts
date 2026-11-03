@@ -11,6 +11,16 @@ export const retirementCalculatorTool: ToolDefinition<RetirementInput, Retiremen
     keywords: ['retirement', 'fire', 'financial independence', 'corpus', 'pension', '401k', 'nps', 'nest egg', 'inflation', 'social security'],
     version: '1.1.0',
     icon: 'Flame',
+    reviewPolicy: {
+      cadence: 'annual',
+      regulatoryCategory: 'financial-regulation',
+      governingBodyOrStandard: 'IRS 401(k)/IRA statutory contribution limits & EPFO/PPF statutory rules',
+      lastReviewedDate: '2026-09-01',
+      nextReviewDate: '2027-01-01',
+      reviewTrigger: 'Annual IRS COLA contribution announcements and statutory pension scheme rate updates',
+      changeRisk: 'medium',
+      notes: 'FIRE / withdrawal math is deterministic, but statutory contribution caps and default inflation benchmarks require annual review.',
+    },
     regulatoryStandards: [
       'Bengen Safe Withdrawal Rate (Trinity Study 4% Rule)',
       'Employee Retirement Income Security Act (ERISA Guidelines)',

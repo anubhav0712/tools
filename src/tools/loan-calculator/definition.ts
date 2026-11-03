@@ -55,6 +55,14 @@ export const loanCalculatorTool: ToolDefinition<LoanCalculatorInput, LoanCalcula
     keywords: ['loan', 'mortgage', 'emi', 'interest', 'home loan', 'amortization', 'prepayment', 'car loan', 'apr', 'tila', 'pmi'],
     version: '1.1.0',
     icon: 'Calculator',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'TILA Regulation Z § 1026.22 / Uniform Amortization Annuity Mathematics',
+      lastReviewedDate: '2026-10-01',
+      changeRisk: 'low',
+      notes: 'Amortization annuity formula is mathematically invariant. TILA APR root-finding is standard IRR.',
+    },
     regulatoryStandards: [
       'Truth in Lending Act (TILA / Regulation Z § 1026.22)',
       'Homeowners Protection Act (HPA 1998 - 78% LTV PMI Auto-Termination)',

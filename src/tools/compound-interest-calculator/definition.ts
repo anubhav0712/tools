@@ -11,6 +11,14 @@ export const compoundInterestCalculatorTool: ToolDefinition<CompoundInterestInpu
     keywords: ['compound interest', 'interest', 'savings', 'hysa', 'cd', 'wealth', 'growth', 'fixed deposit', 'apy', 'tisa'],
     version: '1.1.0',
     icon: 'TrendingUp',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Compound Interest Identity A = P(1 + r/n)^(nt) & TISA APY Standards',
+      lastReviewedDate: '2026-10-01',
+      changeRisk: 'none',
+      notes: 'Strict mathematical identity; zero legislative dependency.',
+    },
     regulatoryStandards: [
       'Truth in Savings Act (TISA / Regulation DD - 12 CFR Part 1030)',
       'FINRA Rule 2210 Communications with the Public (Compound Projections)',

@@ -318,7 +318,7 @@ export const TOOL_SEO_DATA: Record<string, ToolSeoConfig> = {
   },
 
   'cron-parser': {
-    metaTitle: 'Cron Expression Parser & Human Schedule Explainer — Crontab Guru Alternative | Tools',
+    metaTitle: 'Cron Expression Parser & Schedule Explainer | Tools',
     metaDescription: 'Parse 5 and 6 field cron expressions into plain English schedules. See upcoming execution timestamps with zero server latency. 100% in-browser.',
     howToUse: [
       'Enter a 5-part standard crontab expression (minute, hour, day of month, month, day of week).',
@@ -723,5 +723,86 @@ export const TOOL_SEO_DATA: Record<string, ToolSeoConfig> = {
       },
     ],
     relatedToolIds: ['markdown-preview', 'exif-scrubber', 'image-compressor', 'text-analyzer'],
+  },
+
+  'kaveri-photo-resizer': {
+    metaTitle: 'Kaveri 2.0 Marriage Photo Resizer — 2673×1890 px & Under 2MB | Tools',
+    metaDescription: 'Resize and calibrate couple photos for Karnataka Kaveri 2.0 marriage certificate (exact 2673×1890 px PNG under 2MB). 100% private in-browser processing.',
+    howToUse: [
+      'Upload your bride and groom couple photo (JPG, PNG, or WEBP).',
+      'Select Kaveri Joint Photo (2673×1890 px) or Seva Sindhu Passport (200×230 px).',
+      'Use interactive framing controls to pan, zoom, rotate, and center faces.',
+      'Check the live portal compliance checklist to verify exact dimensions and size limit.',
+      'Download your verified Kaveri-ready PNG photo instantly from local browser memory.',
+    ],
+    faqs: [
+      {
+        question: 'Why does the Kaveri 2.0 portal reject my marriage photo?',
+        answer: 'The Karnataka Kaveri 2.0 portal strictly validates that joint marriage certificate photos must be exactly 2673 × 1890 pixels (ISO B2 ratio) in PNG format and under 2.0 MB. Standard online compressors alter pixel dimensions when shrinking file size, triggering upload script rejection.',
+      },
+      {
+        question: 'Are my personal marriage photos uploaded to any server?',
+        answer: 'No. All image resizing, centering, rotation, and file-size quantization run 100% locally in your web browser memory. Zero bytes or personal photos are ever sent to remote cloud servers.',
+      },
+      {
+        question: 'What are the Sub-Registrar Office (SRO) framing rules?',
+        answer: 'Both bride and groom should face forward, positioned waist-up with clear, well-lit faces against a plain white or light background. Avoid informal selfies or wedding ceremony photos where faces are obstructed.',
+      },
+    ],
+    relatedToolIds: ['image-compressor', 'exif-scrubber', 'pdf-manipulator', 'qr-code-tool'],
+  },
+
+  'photo-redactor': {
+    metaTitle: 'Private Photo Redactor & Sensitive Info Blur — Zero Cloud Uploads | Tools',
+    metaDescription: 'Irreversibly pixelate, blur, or black out sensitive text, receipts, faces, and IDs 100% inside your local browser. Automatic EXIF GPS scrubbing and zero server storage.',
+    howToUse: [
+      'Upload any photo, document screenshot, receipt, or ID card.',
+      'Select your preferred redaction style: Pixelate (scrambled blocks), Blur (Gaussian), or Blackout (solid opaque).',
+      'Click and drag bounding boxes directly across sensitive names, numbers, faces, or addresses.',
+      'Adjust the block size or blur intensity slider to your desired censorship level.',
+      'Download your redacted image with all EXIF and GPS location metadata automatically stripped.',
+    ],
+    faqs: [
+      {
+        question: 'Can redacted text be uncovered or reversed by adjusting contrast/brightness?',
+        answer: 'No. Our tool destructively modifies pixel memory buffers directly in your browser. Unlike translucent markup tools, the original pixel values are mathematically replaced with average colors or solid black before file export, making data recovery technically impossible.',
+      },
+      {
+        question: 'Is it safe to redact sensitive financial or medical documents here?',
+        answer: 'Yes! The entire redaction engine runs 100% locally in your browser memory. No image data is ever transmitted across the internet, logged, or stored on remote servers.',
+      },
+      {
+        question: 'Does this tool remove GPS and camera metadata?',
+        answer: 'Yes. When you download the redacted image, all EXIF metadata (including GPS coordinates, camera serial numbers, and capture timestamps) is automatically excluded.',
+      },
+    ],
+    relatedToolIds: ['exif-scrubber', 'kaveri-photo-resizer', 'image-compressor', 'pdf-manipulator'],
+  },
+
+  'passport-photo-grid': {
+    metaTitle: 'Printable 4×6" Passport Photo Grid Maker — 300 DPI Sheet Generator | Tools',
+    metaDescription: 'Tile 4, 6, or 8 passport photos onto a standard 4x6" print sheet at exact 300 DPI with cut lines. Print for $0.30 at any pharmacy kiosk instead of paying $25 at a studio.',
+    howToUse: [
+      'Upload a front-facing portrait photo with a clean white background.',
+      'Select your target country preset (US 2x2", Schengen/EU 35x45mm, India Passport, India Visa, UK).',
+      'Use the zoom and pan controls to align head height and facial centering.',
+      'Review the generated 4x6 inch (1800x1200 px at 300 DPI) sheet with subtle cutting guides.',
+      'Download the print-ready JPEG and order standard 4x6" prints at CVS, Walgreens, or home for ~$0.30.',
+    ],
+    faqs: [
+      {
+        question: 'How do I print this sheet at a pharmacy or store without paying $15 passport fees?',
+        answer: 'Order standard 4x6 inch (10x15 cm) photo prints, which typically cost only $0.25 to $0.35 each. Do not select the store\'s dedicated "Passport Photo" service, which charges $15+ for the exact same paper! Simply submit your downloaded 4x6 sheet as a regular photo.',
+      },
+      {
+        question: 'What print settings should I use to avoid dimensional distortion?',
+        answer: 'Always set your printer or photo kiosk to "100% / Actual Size". Never select "Fit to Page" or "Auto-Crop", as scaling the image will alter the exact millimeter dimensions required by government passport agencies.',
+      },
+      {
+        question: 'Are cutting guidelines included?',
+        answer: 'Yes. Subtle light-gray hairline cutting guides are rendered between each photo cell so you can easily cut them out with scissors or a paper trimmer.',
+      },
+    ],
+    relatedToolIds: ['kaveri-photo-resizer', 'image-compressor', 'photo-redactor', 'exif-scrubber'],
   },
 };

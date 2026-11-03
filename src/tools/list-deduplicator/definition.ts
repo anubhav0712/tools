@@ -34,6 +34,14 @@ export const listDeduplicatorTool: ToolDefinition<
     keywords: ['list', 'deduplicate', 'unique', 'sort', 'intersection', 'union', 'set', 'text'],
     version: '1.0.0',
     icon: 'ListFilter',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Discrete Mathematics Set Operations (Zermelo-Fraenkel set theory)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Mathematical set operations (intersection, union, relative complement) are invariant.',
+    },
   },
   examples: [
     {

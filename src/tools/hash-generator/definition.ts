@@ -32,6 +32,14 @@ export const hashGeneratorTool: ToolDefinition<HashGeneratorInput, HashGenerator
     version: '1.0.0',
     icon: 'Hash',
     persistableInUrl: false, // Prevent HMAC keys or secrets from persisting in URL
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'NIST FIPS 180-4 (Secure Hash Standard) / IETF RFC 1321 (MD5) / W3C Web Cryptography API',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Cryptographic digest specifications are mathematically and standards immutable.',
+    },
   },
   examples: [
     {

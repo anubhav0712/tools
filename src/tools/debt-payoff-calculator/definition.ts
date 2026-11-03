@@ -11,6 +11,16 @@ export const debtPayoffCalculatorTool: ToolDefinition<DebtPayoffInput, DebtPayof
     keywords: ['credit card', 'debt', 'snowball', 'payoff', 'apr', 'interest', 'minimum payment', 'debt free', 'card act', 'balance transfer'],
     version: '1.1.0',
     icon: 'CreditCard',
+    reviewPolicy: {
+      cadence: 'semi-annual',
+      regulatoryCategory: 'financial-regulation',
+      governingBodyOrStandard: 'Credit CARD Act 2009 / CFPB 12 CFR § 1026.7 & RBI Credit Card Master Directions',
+      lastReviewedDate: '2026-09-01',
+      nextReviewDate: '2027-03-01',
+      reviewTrigger: 'Regulatory changes to statutory minimum monthly payment calculations on revolving credit',
+      changeRisk: 'low',
+      notes: 'Avalanche / snowball optimization is pure math; minimum payment calculation formulas follow credit card statutory rules.',
+    },
     regulatoryStandards: [
       'Credit CARD Act of 2009 (12 CFR § 1026.7(b)(12) Mandatory 36-Month Payoff Disclosures)',
       'Federal Reserve Board Minimum Payment Warning Standards',

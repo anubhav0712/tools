@@ -50,6 +50,16 @@ export const exifScrubberTool: ToolDefinition<
     version: '1.0.0',
     icon: 'Camera',
     persistableInUrl: false, // Never serialize binary images into URL!
+    reviewPolicy: {
+      cadence: 'standards-track',
+      regulatoryCategory: 'data-privacy-law',
+      governingBodyOrStandard: 'Camera & Imaging Products Association (CIPA DC-008-2019 / Exif 2.32 Standard)',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-10-31',
+      reviewTrigger: 'New EXIF metadata tag registrations or mobile computational photography privacy disclosures',
+      changeRisk: 'medium',
+      notes: 'Review whenever new privacy-sensitive metadata markers (e.g. spatial audio, computational photography tags, AI camera watermarks) are introduced.',
+    },
   },
   examples: [],
   execute: executeExifScrubber,

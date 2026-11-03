@@ -31,6 +31,14 @@ export const cronParserTool: ToolDefinition<CronParserInput, CronParserOutput> =
     keywords: ['cron', 'schedule', 'parser', 'humanize', 'timer', 'crontab', 'automation', 'developer'],
     version: '1.0.0',
     icon: 'Clock',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'IEEE Std 1003.1-2017 (POSIX) crontab specification',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Standard 5-field cron parsing specification is fixed.',
+    },
   },
   examples: [
     {

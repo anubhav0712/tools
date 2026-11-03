@@ -35,6 +35,14 @@ export const urlInspectorTool: ToolDefinition<UrlInspectorInput, UrlInspectorOut
     keywords: ['url', 'query', 'encode', 'decode', 'uri', 'utm', 'params', 'developer'],
     version: '1.0.0',
     icon: 'Link2',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'IETF RFC 3986 (Uniform Resource Identifier) / WHATWG URL Standard',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'URL grammar parsing follows WHATWG living standard and RFC 3986.',
+    },
   },
   examples: [
     {

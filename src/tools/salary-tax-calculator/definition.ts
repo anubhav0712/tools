@@ -11,6 +11,16 @@ export const salaryTaxCalculatorTool: ToolDefinition<SalaryTaxInput, SalaryTaxOu
     keywords: ['salary', 'in-hand', 'take home', 'tax', 'income tax', 'ctc', 'paycheck', 'fica', '401k', 'epf', 'new tax regime', 'marginal relief', 'section 87a'],
     version: '1.1.0',
     icon: 'DollarSign',
+    reviewPolicy: {
+      cadence: 'annual',
+      regulatoryCategory: 'tax-law',
+      governingBodyOrStandard: 'Indian Income Tax Act 1961 (Sections 115BAC, 87A) & US Internal Revenue Code (IRC 26 U.S.C.)',
+      lastReviewedDate: '2026-08-01',
+      nextReviewDate: '2027-02-01',
+      reviewTrigger: 'Annual Indian Union Budget (Feb 1) and US IRS annual inflation procedures (Rev. Proc. Oct/Nov)',
+      changeRisk: 'high',
+      notes: 'Requires review whenever tax slabs, standard deductions, Section 87A marginal relief proviso, 401(k) limits, or FICA wage ceilings change.',
+    },
     regulatoryStandards: [
       'Indian Income Tax Act 1961 (Sections 115BAC, 87A Marginal Relief, 16(ia) Standard Deduction)',
       'US Internal Revenue Code (IRC 26 U.S.C. §§ 1, 3101 FICA & Medicare Surtax)',

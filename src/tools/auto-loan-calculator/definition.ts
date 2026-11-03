@@ -11,6 +11,14 @@ export const autoLoanCalculatorTool: ToolDefinition<AutoLoanInput, AutoLoanOutpu
     keywords: ['car loan', 'auto loan', 'car emi', 'vehicle financing', 'rto', 'sales tax', 'trade in', 'car payment', 'underwater', 'gap insurance'],
     version: '1.1.0',
     icon: 'Car',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Uniform Reducing Balance Amortization / TILA Disclosures',
+      lastReviewedDate: '2026-10-01',
+      changeRisk: 'low',
+      notes: 'Core amortization math is invariant. Sales tax calculations use user-provided rates.',
+    },
     regulatoryStandards: [
       'Federal Trade Commission (FTC) CARS Rule (16 CFR Part 463)',
       'Truth in Lending Act (TILA / Regulation Z Auto Financing Disclosures)',

@@ -39,6 +39,16 @@ export const passphraseGeneratorTool: ToolDefinition<
     version: '1.0.0',
     icon: 'Key',
     persistableInUrl: false, // Never leak generated passwords into URL!
+    reviewPolicy: {
+      cadence: 'standards-track',
+      regulatoryCategory: 'security-standards',
+      governingBodyOrStandard: 'NIST SP 800-63B (Digital Identity Guidelines / Authenticator Requirements)',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-10-31',
+      reviewTrigger: 'NIST Special Publication revisions and EFF Diceware wordlist updates',
+      changeRisk: 'medium',
+      notes: 'Verify entropy thresholds and password composition guidance against latest NIST authenticators specification.',
+    },
   },
   examples: [
     {

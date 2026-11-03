@@ -26,6 +26,14 @@ export const sqlFormatterTool: ToolDefinition<SqlFormatterInput, SqlFormatterOut
     keywords: ['sql', 'format', 'beautify', 'minify', 'database', 'postgres', 'mysql', 'query', 'developer'],
     version: '1.0.0',
     icon: 'Database',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'ISO/IEC 9075:2023 (SQL Standard) grammar',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'ANSI/ISO SQL grammar indentation and formatting rules are stable.',
+    },
   },
   examples: [
     {

@@ -11,6 +11,16 @@ export const inflationCalculatorTool: ToolDefinition<InflationInput, InflationOu
     keywords: ['inflation', 'purchasing power', 'cpi', 'future value', 'rule of 72', 'cost of living', 'wealth decay', 'bls', 'education inflation'],
     version: '1.1.0',
     icon: 'Percent',
+    reviewPolicy: {
+      cadence: 'annual',
+      regulatoryCategory: 'financial-regulation',
+      governingBodyOrStandard: 'Central Bank Inflation Targeting Frameworks (RBI 4% +/- 2%, US Federal Reserve 2% target)',
+      lastReviewedDate: '2026-09-01',
+      nextReviewDate: '2027-01-01',
+      reviewTrigger: 'Central bank macroeconomic baseline updates and annual CPI index rebasing',
+      changeRisk: 'medium',
+      notes: 'Compound inflation formula is mathematical; default inflation rate presets require periodic macroeconomic alignment.',
+    },
     regulatoryStandards: [
       'US Bureau of Labor Statistics (BLS) Consumer Price Index (CPI) Standards',
       'Reserve Bank of India (RBI) Flexible Inflation Targeting Framework',

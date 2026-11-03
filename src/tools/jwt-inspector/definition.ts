@@ -37,6 +37,16 @@ export const jwtInspectorTool: ToolDefinition<JwtInspectorInput, JwtInspectorOut
     version: '1.0.0',
     icon: 'KeyRound',
     persistableInUrl: false, // Do NOT serialize sensitive auth tokens into URL hash!
+    reviewPolicy: {
+      cadence: 'standards-track',
+      regulatoryCategory: 'security-standards',
+      governingBodyOrStandard: 'IETF RFC 7519 (JWT), RFC 7515 (JWS), RFC 8725 (JWT Best Current Practices)',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-10-31',
+      reviewTrigger: 'IETF OAuth WG / JOSE WG publications or new standard claim registrations',
+      changeRisk: 'medium',
+      notes: 'Inspect for new RFC standard claims, deprecated signature algorithms, or updated security recommendations.',
+    },
   },
   examples: [
     {

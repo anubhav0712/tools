@@ -26,6 +26,16 @@ export const svgSanitizerTool: ToolDefinition<SvgSanitizerInput, SvgSanitizerOut
     keywords: ['svg', 'sanitizer', 'cleaner', 'xss', 'security', 'vector', 'optimizer', 'design'],
     version: '1.0.0',
     icon: 'Sparkles',
+    reviewPolicy: {
+      cadence: 'event-driven',
+      regulatoryCategory: 'security-standards',
+      governingBodyOrStandard: 'OWASP XSS Prevention Cheat Sheet / W3C SVG 2 Specification',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-04-30',
+      reviewTrigger: 'Publication of new SVG-based XSS vectors, CVEs in browser SVG engines, or W3C element additions',
+      changeRisk: 'high',
+      notes: 'Audit against newly discovered SVG vectors, novel script execution techniques, CSS injection, and foreignObject exploits.',
+    },
   },
   examples: [
     {

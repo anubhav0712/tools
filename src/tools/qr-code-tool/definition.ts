@@ -32,6 +32,14 @@ export const qrCodeTool: ToolDefinition<QrCodeToolInput, QrCodeToolOutput> = {
     version: '1.0.0',
     icon: 'QrCode',
     persistableInUrl: false, // Wi-Fi passwords and 2FA seeds should NEVER persist in URL hash!
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'ISO/IEC 18004:2015 QR Code Standard & Wi-Fi Alliance WPA Credentials',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Reed-Solomon error correction and ISO/IEC 18004 matrix encoding rules are standardized and fixed.',
+    },
   },
   examples: [
     {

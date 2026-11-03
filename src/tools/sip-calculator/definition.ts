@@ -46,6 +46,14 @@ export const sipCalculatorTool: ToolDefinition<SipCalculatorInput, SipCalculator
     keywords: ['sip', 'mutual fund', 'investment', 'compound', 'wealth', 'dca', 'stocks', 'returns', '401k', 'step up', 'ltcg'],
     version: '1.1.0',
     icon: 'TrendingUp',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'Future Value of Annuity In Advance Formula (Financial Mathematics)',
+      lastReviewedDate: '2026-10-01',
+      changeRisk: 'none',
+      notes: 'Strict mathematical compounding formula; zero legislative dependency.',
+    },
     regulatoryStandards: [
       'Association of Mutual Funds in India (AMFI) Disclosure Norms',
       'Securities and Exchange Board of India (SEBI) Performance Reporting Regulations',

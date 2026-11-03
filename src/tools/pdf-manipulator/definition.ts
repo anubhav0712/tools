@@ -33,6 +33,14 @@ export const pdfManipulatorTool: ToolDefinition<
     version: '1.0.0',
     icon: 'Files',
     persistableInUrl: false, // Critical: Sensitive documents must NEVER leak in URL!
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'algorithmic-standard',
+      governingBodyOrStandard: 'ISO 32000-1:2008 Document Management — Portable Document Format (PDF 1.7)',
+      lastReviewedDate: '2026-10-31',
+      changeRisk: 'none',
+      notes: 'Standard PDF object serialization and cross-reference table syntax are standardized.',
+    },
   },
   examples: [],
   execute: executePdfManipulator,

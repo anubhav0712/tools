@@ -11,6 +11,14 @@ export const emergencyFundCalculatorTool: ToolDefinition<EmergencyFundInput, Eme
     keywords: ['emergency fund', 'safety net', 'savings', 'expenses', 'budget', 'rainy day', 'liquidity', 'runway', 'hysa', 'cfp'],
     version: '1.1.0',
     icon: 'ShieldAlert',
+    reviewPolicy: {
+      cadence: 'immutable',
+      regulatoryCategory: 'financial-regulation',
+      governingBodyOrStandard: 'CFP Board / Financial Planning Standards Board (FPSB) Personal Liquidity Guidelines',
+      lastReviewedDate: '2026-10-01',
+      changeRisk: 'low',
+      notes: 'Multiplicative budgeting model based on user-entered monthly expenses. No statutory hardcoding.',
+    },
     regulatoryStandards: [
       'CFP Board Financial Planning Practice Standards (Personal Liquidity Guidelines)',
       'FDIC Consumer Protection Guidance on Emergency Cash Reserves',

@@ -8,16 +8,24 @@ function parseArgs() {
   let name = '';
   let category = '';
   let description = '';
+  let cadence = '';
+  let regulatoryCategory = '';
+  let governingStandard = '';
+  let risk = '';
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--name' && args[i + 1]) name = args[++i];
     else if (arg === '--category' && args[i + 1]) category = args[++i];
     else if (arg === '--description' && args[i + 1]) description = args[++i];
+    else if (arg === '--cadence' && args[i + 1]) cadence = args[++i];
+    else if (arg === '--regulatory-category' && args[i + 1]) regulatoryCategory = args[++i];
+    else if (arg === '--governing-standard' && args[i + 1]) governingStandard = args[++i];
+    else if (arg === '--risk' && args[i + 1]) risk = args[++i];
     else if (!arg.startsWith('-') && !id) id = arg;
   }
 
-  return { id, name, category, description };
+  return { id, name, category, description, cadence, regulatoryCategory, governingStandard, risk };
 }
 
 function toPascalCase(str: string): string {
@@ -74,8 +82,35 @@ async function main() {
 
   const defaultName = toTitleCase(toolId);
   const toolName = parsed.name || (await ask('Human-readable Name', defaultName));
-  const category = parsed.category || (await ask('Category (text | converter | developer | crypto | everyday)', 'everyday'));
+  const category = parsed.category || (await ask('Category (text | converter | developer | crypto | everyday | visual | finance)', 'everyday'));
   const description = parsed.description || (await ask('Brief Description', `Fast and private ${toolName} running 100% in your browser.`));
+
+  const defaultCadence = category === 'finance' ? 'annual' : 'immutable';
+  const cadence = parsed.cadence || (await ask('Business Logic Review Cadence (immutable | annual | semi-annual | quarterly | standards-track | event-driven)', defaultCadence));
+
+  const defaultRegCategory =
+    cadence === 'immutable'
+      ? 'algorithmic-standard'
+      : category === 'finance'
+      ? 'financial-regulation'
+      : category === 'crypto'
+      ? 'security-standards'
+      : 'none';
+  const regulatoryCategory = parsed.regulatoryCategory || (await ask('Regulatory Category (tax-law | financial-regulation | accessibility-std | security-standards | data-privacy-law | algorithmic-standard | none)', defaultRegCategory));
+
+  const defaultGoverningStandard =
+    cadence === 'immutable'
+      ? 'Standard Algorithm / RFC Specification'
+      : category === 'finance'
+      ? 'Applicable Financial & Tax Regulatory Authority'
+      : 'Evolving Industry Standard';
+  const governingStandard = parsed.governingStandard || (await ask('Governing Body or Standard', defaultGoverningStandard));
+
+  const defaultRisk = cadence === 'immutable' ? 'none' : category === 'finance' ? 'high' : 'medium';
+  const risk = parsed.risk || (await ask('Change Risk Level (high | medium | low | none)', defaultRisk));
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const nextReviewStr = cadence === 'immutable' ? undefined : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   if (rl) {
     (rl as readline.Interface).close();
@@ -108,6 +143,14 @@ export const ${camelName}Tool: ToolDefinition<${pascalName}Input, ${pascalName}O
     keywords: ['${toolId}', '${category}'],
     version: '1.0.0',
     icon: 'Wrench',
+    reviewPolicy: {
+      cadence: '${cadence}' as any,
+      regulatoryCategory: '${regulatoryCategory}' as any,
+      governingBodyOrStandard: '${governingStandard}',
+      lastReviewedDate: '${todayStr}',
+      ${nextReviewStr ? `nextReviewDate: '${nextReviewStr}',` : ''}
+      changeRisk: '${risk}' as any,
+    },
   },
   examples: [
     {

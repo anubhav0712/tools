@@ -39,6 +39,16 @@ export const colorContrastCheckerTool: ToolDefinition<
     keywords: ['color', 'contrast', 'wcag', 'accessibility', 'a11y', 'palette', 'tailwind', 'hex', 'design'],
     version: '1.0.0',
     icon: 'Palette',
+    reviewPolicy: {
+      cadence: 'standards-track',
+      regulatoryCategory: 'accessibility-std',
+      governingBodyOrStandard: 'W3C Web Content Accessibility Guidelines (WCAG 2.1 / WCAG 2.2 / APCA WCAG 3.0 draft)',
+      lastReviewedDate: '2026-10-31',
+      nextReviewDate: '2027-04-30',
+      reviewTrigger: 'W3C WAI formal releases of WCAG 2.2 adoption or WCAG 3.0 APCA contrast algorithms',
+      changeRisk: 'medium',
+      notes: 'Monitor W3C accessibility guidelines for transitions from WCAG 2.x relative luminance ratios to WCAG 3.0 APCA.',
+    },
   },
   examples: [
     {

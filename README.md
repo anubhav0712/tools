@@ -40,7 +40,7 @@ npm run preview
 
 ---
 
-## Tools Catalog (31 In-Browser Tools)
+## Tools Catalog (34 In-Browser Tools)
 
 Every tool runs 100% locally on your machine with zero server requests.
 
@@ -72,18 +72,21 @@ Every tool runs 100% locally on your machine with zero server requests.
 - **[Image EXIF & GPS Metadata Scrubber](#tool=exif-scrubber)**: Inspect and permanently strip EXIF tags, GPS coordinates, device models, and camera parameters from JPEG images before sharing.
 - **[In-Browser Image Compressor](#tool=image-compressor)**: Lossy and lossless image compression using HTML5 Canvas / OffscreenCanvas with real-time resolution scaling, quality sliders, and WebP/JPEG/PNG format conversion.
 - **[Client-Side PDF Manipulator](#tool=pdf-manipulator)**: Merge multiple PDF documents and extract custom page ranges using a pure browser-based binary PDF object assembler.
+- **[Kaveri 2.0 Photo Resizer](#tool=kaveri-photo-resizer)**: Calibrated specifically for Karnataka Kaveri 2.0 portal (2673×1890 px PNG under 2MB) and Sub-Registrar Office specifications.
+- **[Private Photo Redactor](#tool=photo-redactor)**: Irreversibly blur, pixelate, or black out sensitive personal data (IDs, credit cards, faces, addresses) 100% locally in your browser.
+- **[Passport Photo Grid Maker](#tool=passport-photo-grid)**: Tile 4, 6, or 8 passport photos onto a standard 4x6" print sheet at exact 300 DPI with cutting lines for kiosk printing.
 
 ### 💰 Personal Finance Calculators
-- **Loan & EMI Calculator**: Fixed-rate amortization schedules with monthly interest vs. principal breakdown.
-- **SIP Calculator**: Systematic Investment Plan future value projection with compound growth charts.
-- **Compound Interest Calculator**: Calculate compound returns with regular deposits and custom compounding frequencies.
-- **Salary & Tax Estimator**: Net pay breakdown with tax slabs, deductions, and take-home calculations.
-- **Retirement Planner**: FIRE nest egg calculation and safe withdrawal rate forecasting.
-- **Debt Payoff Planner**: Avalanche vs. Snowball payoff timeline comparison.
-- **Inflation Impact Calculator**: Purchasing power erosion across 5, 10, 20, and 30-year horizons.
-- **Emergency Fund Calculator**: Essential expense buffer calculator with liquid allocation guidance.
-- **Fixed Deposit (FD) Calculator**: Fixed deposit maturity values across cumulative and non-cumulative options.
-- **Auto Loan Calculator**: Total vehicle loan cost including down payment, interest, taxes, and trade-in value.
+- **[Loan & EMI Calculator](#tool=loan-calculator)**: Fixed-rate amortization schedules with monthly interest vs. principal breakdown.
+- **[SIP Calculator](#tool=sip-calculator)**: Systematic Investment Plan future value projection with compound growth charts.
+- **[Compound Interest Calculator](#tool=compound-interest-calculator)**: Calculate compound returns with regular deposits and custom compounding frequencies.
+- **[Salary & Tax Estimator](#tool=salary-tax-calculator)**: Net pay breakdown with tax slabs, deductions, and take-home calculations.
+- **[Retirement Planner](#tool=retirement-calculator)**: FIRE nest egg calculation and safe withdrawal rate forecasting.
+- **[Debt Payoff Planner](#tool=debt-payoff-calculator)**: Avalanche vs. Snowball payoff timeline comparison.
+- **[Inflation Impact Calculator](#tool=inflation-calculator)**: Purchasing power erosion across 5, 10, 20, and 30-year horizons.
+- **[Emergency Fund Calculator](#tool=emergency-fund-calculator)**: Essential expense buffer calculator with liquid allocation guidance.
+- **[Fixed Deposit (FD) Calculator](#tool=fd-calculator)**: Fixed deposit maturity values across cumulative and non-cumulative options.
+- **[Auto Loan Calculator](#tool=auto-loan-calculator)**: Total vehicle loan cost including down payment, interest, taxes, and trade-in value.
 
 ---
 

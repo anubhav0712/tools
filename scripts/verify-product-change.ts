@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 const TOOLS_SRC_DIR = path.resolve(ROOT_DIR, 'src', 'tools');
 
-export type StageName = 'research' | 'development' | 'qa' | 'compliance_security' | 'seo';
+export type StageName = 'research' | 'development' | 'code_review' | 'qa' | 'compliance_security' | 'seo';
 
 export interface StageIssue {
   stage: StageName;
@@ -38,7 +38,105 @@ export interface WorkflowAuditResult {
 }
 
 /**
- * Stage 3 (QA): Runs TypeScript verification and Vitest tests.
+ * Stage 3 (Code & Architecture Review):
+ * - Staff-architect level code and architectural review.
+ * - Questions design rationale, algorithmic complexity, and why specific patterns were chosen.
+ * - Verifies pure engine isolation (zero React/DOM dependencies in engine.ts).
+ * - Verifies developer responsibility: README catalog and documentation update.
+ */
+function auditCodeReview(): StageReport {
+  const issues: StageIssue[] = [];
+  const tools = registry.getAll();
+  const readmePath = path.resolve(ROOT_DIR, 'README.md');
+
+  // 1. README Documentation & Catalog Check
+  if (!fs.existsSync(readmePath)) {
+    issues.push({
+      stage: 'code_review',
+      targetStage: 'development',
+      severity: 'CRITICAL',
+      component: 'README.md',
+      summary: 'README.md is missing from project root.',
+      details: 'Developer responsibility includes maintaining project documentation.',
+      recommendedFix: 'Create and maintain README.md with tool documentation.',
+    });
+  } else {
+    const readmeContent = fs.readFileSync(readmePath, 'utf-8');
+
+    for (const tool of tools) {
+      const toolId = tool.metadata.id;
+      const expectedLink = `#tool=${toolId}`;
+      if (!readmeContent.includes(expectedLink)) {
+        issues.push({
+          stage: 'code_review',
+          targetStage: 'development',
+          severity: 'CRITICAL',
+          component: `README.md Catalog: ${toolId}`,
+          summary: `Tool "${toolId}" is registered in code but not documented in README.md.`,
+          details: `Every registered tool must have an entry with deep link "[${tool.metadata.name}](#tool=${toolId})" in the README.md catalog.`,
+          recommendedFix: `Update README.md to include an entry for "${tool.metadata.name}" with link "${expectedLink}".`,
+        });
+      }
+    }
+
+    // Verify tool count in README heading
+    const countMatch = readmeContent.match(/## Tools Catalog \((\d+) In-Browser Tools\)/);
+    if (countMatch) {
+      const declaredCount = parseInt(countMatch[1], 10);
+      if (declaredCount !== tools.length) {
+        issues.push({
+          stage: 'code_review',
+          targetStage: 'development',
+          severity: 'WARNING',
+          component: 'README.md Heading',
+          summary: `README tool count (${declaredCount}) does not match registered tools count (${tools.length}).`,
+          details: `The heading in README.md claims ${declaredCount} tools, but ${tools.length} are registered in the codebase.`,
+          recommendedFix: `Update the catalog heading in README.md to "## Tools Catalog (${tools.length} In-Browser Tools)".`,
+        });
+      }
+    }
+  }
+
+  // 2. Architectural Code Quality: Pure Engine Isolation
+  if (fs.existsSync(TOOLS_SRC_DIR)) {
+    const toolDirs = fs.readdirSync(TOOLS_SRC_DIR, { withFileTypes: true });
+    for (const dir of toolDirs) {
+      if (!dir.isDirectory()) continue;
+      const enginePath = path.join(TOOLS_SRC_DIR, dir.name, 'engine.ts');
+      if (fs.existsSync(enginePath)) {
+        const engineContent = fs.readFileSync(enginePath, 'utf-8');
+
+        // Check: engine must not import React or DOM packages
+        if (
+          engineContent.includes("from 'react'") ||
+          engineContent.includes('from "react"') ||
+          engineContent.includes("from 'react-dom'") ||
+          engineContent.includes('from "react-dom"')
+        ) {
+          issues.push({
+            stage: 'code_review',
+            targetStage: 'development',
+            severity: 'BLOCKER',
+            component: `src/tools/${dir.name}/engine.ts`,
+            summary: `Architectural boundary violation: engine.ts imports React.`,
+            details: `Engines must be pure, deterministic TypeScript modules with zero React/DOM dependencies to enable headless testing and node portability.`,
+            recommendedFix: `Move UI/React hooks or presentation logic to ui.tsx and keep engine.ts strictly pure.`,
+          });
+        }
+      }
+    }
+  }
+
+  return {
+    stage: 'code_review',
+    passed: issues.filter((i) => i.severity === 'BLOCKER' || i.severity === 'CRITICAL').length === 0,
+    issues,
+    metrics: { auditedTools: tools.length, issueCount: issues.length },
+  };
+}
+
+/**
+ * Stage 4 (QA): Runs TypeScript verification and Vitest tests.
  */
 function auditQA(): StageReport {
   const issues: StageIssue[] = [];
@@ -343,6 +441,7 @@ export function runWorkflowAudit(targetStage?: StageName): WorkflowAuditResult {
       passed: true,
       issues: [],
     },
+    code_review: { stage: 'code_review', passed: true, issues: [] },
     qa: { stage: 'qa', passed: true, issues: [] },
     compliance_security: { stage: 'compliance_security', passed: true, issues: [] },
     seo: { stage: 'seo', passed: true, issues: [] },
@@ -350,22 +449,28 @@ export function runWorkflowAudit(targetStage?: StageName): WorkflowAuditResult {
 
   const stagesToRun = targetStage
     ? [targetStage]
-    : (['qa', 'compliance_security', 'seo'] as StageName[]);
+    : (['code_review', 'qa', 'compliance_security', 'seo'] as StageName[]);
+
+  if (stagesToRun.includes('code_review')) {
+    console.log('🧐 Auditing Stage 3: Code & Architecture Review (README & Boundaries)...');
+    stageReports.code_review = auditCodeReview();
+    console.log(`   Code & Architecture Review Result: ${stageReports.code_review.passed ? '✅ PASSED' : '❌ FAILED'}`);
+  }
 
   if (stagesToRun.includes('qa')) {
-    console.log('🧪 Auditing Stage 3: QA Testing & Build Integrity...');
+    console.log('🧪 Auditing Stage 4: QA Testing & Build Integrity...');
     stageReports.qa = auditQA();
     console.log(`   QA Result: ${stageReports.qa.passed ? '✅ PASSED' : '❌ FAILED'}`);
   }
 
   if (stagesToRun.includes('compliance_security')) {
-    console.log('🛡️  Auditing Stage 4: Compliance & In-Browser Security Sandbox...');
+    console.log('🛡️  Auditing Stage 5: Compliance & In-Browser Security Sandbox...');
     stageReports.compliance_security = auditComplianceAndSecurity();
     console.log(`   Compliance & Security Result: ${stageReports.compliance_security.passed ? '✅ PASSED' : '❌ FAILED'}`);
   }
 
   if (stagesToRun.includes('seo')) {
-    console.log('🔍 Auditing Stage 5: SEO Analysis & Discoverability...');
+    console.log('🔍 Auditing Stage 6: SEO Analysis & Discoverability...');
     stageReports.seo = auditSEO();
     console.log(`   SEO Result: ${stageReports.seo.passed ? '✅ PASSED' : '❌ FAILED'}`);
   }

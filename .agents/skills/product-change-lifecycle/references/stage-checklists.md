@@ -46,11 +46,34 @@ Each stage of the Product Change Lifecycle has mandatory criteria that must be s
   - Non-blocking computations (wrap intense operations or use Web Workers if heavy).
 - [ ] **Registry Integration**:
   - Register tool in `src/tools/index.ts`.
-  - Export definition from `src/tools/<tool-id>/index.ts` if applicable.
+- [ ] **Documentation & Catalog Updates (`README.md`)**:
+  - If a new tool was created: Add the tool to the Tools Catalog in `README.md` with deep link `[Name](#tool=<id>)`, summary bullet point, and privacy tag.
+  - Update the total tool count in `README.md` (e.g. `(34 In-Browser Tools)`).
+  - If developer CLI scripts, build commands, or architectural patterns changed: Update the Quick Start / Developer Guide sections of `README.md`.
 
 ---
 
-## Stage 3: QA & Automated Testing
+## Stage 3: Code & Architecture Review (Industry-Grade)
+
+### Lead Role: Code Reviewer / Staff Architect
+- [ ] **Design Rationale & "Why" Interrogation**:
+  - *Why was this specific algorithm, data structure, or pattern chosen over simpler or native alternatives?*
+  - Is there a clear technical justification for why custom parsing was used instead of native browser Web APIs (e.g. `Intl`, `SubtleCrypto`, `URL`, `OffscreenCanvas`)?
+  - If state is lifted or stored in URL hashes, *why* was that strategy selected?
+- [ ] **Complexity Evaluation (Over vs. Under-engineering)**:
+  - **Reject Overengineering**: Eliminate unnecessary abstractions, premature indirection, overly generic factory patterns, and excessive dependency chains.
+  - **Reject Underengineering**: Flag naive implementations that cause $O(N^2)$ freezing, memory leaks on large inputs, or unhandled numeric overflow.
+- [ ] **Architectural Boundary Invariants**:
+  - **Pure Engine Isolation**: Verify that `engine.ts` has ZERO imports of React (`react`, `react-dom`, `@types/react`) or DOM-only global mutations.
+  - **Component Decoupling**: Verify single-responsibility separation between calculations and presentation.
+- [ ] **Documentation of Non-Obvious Decisions**:
+  - Are non-trivial mathematical tricks or algorithmic choices documented with inline comments or Architectural Decision Records (ADRs)?
+- [ ] **README Sync Verification**:
+  - Verify that `README.md` accurately reflects the changes (tool catalog entries, deep links, tool counts, and CLI instructions).
+
+---
+
+## Stage 4: QA & Automated Testing
 
 ### Lead Role: QA Tester
 - [ ] **Test Coverage in `engine.test.ts`**:
@@ -62,11 +85,11 @@ Each stage of the Product Change Lifecycle has mandatory criteria that must be s
 - [ ] **TypeScript Build Check**:
   - `npx tsc -b` succeeds with 0 errors across the entire repository.
 - [ ] **Regression Assurance**:
-  - Existing 31+ tools continue passing all unit tests without degradation.
+  - Existing 34+ tools continue passing all unit tests without degradation.
 
 ---
 
-## Stage 4: Compliance & Security Auditing
+## Stage 5: Compliance & Security Auditing
 
 ### Lead Role: Compliance & Security Officer
 - [ ] **Statutory & Regulatory Review Policy**:
@@ -86,7 +109,7 @@ Each stage of the Product Change Lifecycle has mandatory criteria that must be s
 
 ---
 
-## Stage 5: SEO & Discoverability Analysis
+## Stage 6: SEO & Discoverability Analysis
 
 ### Lead Role: SEO Specialist
 - [ ] **SEO Configuration in `src/core/seo-data.ts`**:
